@@ -15,6 +15,8 @@ struct movie {
 	int timesRented;
 }movies[100];
 
+int numberOfMovies = 0;
+
 struct customer {
 	string name;
 	string rentedMovie;
@@ -22,6 +24,8 @@ struct customer {
 	tm rentDate;
 	tm returnDate;
 }customers[100];
+
+int numberOfCustomers = 0;
 
 void addMovie();
 void addCustomer();
