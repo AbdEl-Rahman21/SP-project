@@ -27,6 +27,7 @@ struct customer {
 
 int numberOfCustomers = 0;
 
+int displayMenu();
 void addMovie();
 void addCustomer();
 void listMovies();
@@ -40,39 +41,85 @@ void listMostRentedMovies();
 void save();
 void load();
 void listMostRatedMovies();
-int displayMenu();
 
 int main() {
-	char answer;
-	do {
-		switch (displayMenu())
-		{
-	case 1: addMovie(); break;
-	case 2:addCustomer(); break;
-	case 3:listCustomers(); break;
-	case 4:listMovies(); break;
-	case 5:listRentedMovies(); break;
-	case 6:rentMovie(); break;
-	case 7:listOverdueCustomers(); break;
-	case 8:listMostRentedMovies(); break;
-	case 9:listMostRatedMovies(); break;
-	case 10:returnMovie(); break;
-	default : cout << "Invalid Input"; answer = 'y';
+	char answer = '\0';
 
-	}
-	cout<< "Do you want to continue (Y/N) : ";
-	cin >> answer;
-}while (answer == 'Y' || answer == 'y');
-return 0;
+	do {
+		switch (displayMenu()) {
+		case 1:
+			addMovie();
+
+			break;
+		case 2:
+			addCustomer();
+
+			break;
+		case 3:
+			listCustomers();
+
+			break;
+		case 4:
+			listMovies();
+
+			break;
+		case 5:
+			listRentedMovies();
+
+			break;
+		case 6:
+			rentMovie();
+
+			break;
+		case 7:
+			returnMovie();
+
+			break;
+		case 8:
+			listOverdueCustomers();
+
+			break;
+		case 9:
+			listMostRentedMovies();
+
+			break;
+		case 10:
+			listMostRatedMovies();
+
+			break;
+		default: 
+			cout << "Invalid choice!" << endl;
+			cout << "Please re - enter the correct one." << endl;
+
+			answer = 'y';
+
+			continue;
+		}
+
+		cout << "Press 'Y' to continue or any other key to exit: ";
+		cin >> answer;
+	} while (answer == 'Y' || answer == 'y');
+
+	return 0;
 }
-int displayMenu()
-{
-	int option;
-	cout << " Main Menu" << endl;
-	cout << "***********   " << endl;
-	cout << "Press" << endl;
-	cout << "1) Add Movie" << endl << "2) Add customer" << endl << "3) List all customers" << endl << "4) List all movies" << endl << "5) List all rented movies" << endl <<
-		"6) Rent Movie" << endl << "7) Summary of overdue customers" << endl << "8) List most rented movies" << endl << "9) List the highest rated movies" << endl << "10) Return Movie" << endl;
+
+int displayMenu() {
+	int option = 0;
+
+	cout << "\t\tMain Menu" << endl;
+	cout << "\t\t***********" << endl;
+	cout << "Press:-" << endl;
+	cout << "1) Add Movie" << endl;
+	cout << "2) Add customer" << endl;
+	cout << "3) List all customers" << endl;
+	cout << "4) List all movies" << endl;
+	cout << "5) List all rented movies" << endl;
+	cout << "6) Rent Movie" << endl;
+	cout << "7) Return Movie" << endl;
+	cout << "8) Summary of overdue customers" << endl;
+	cout << "9) List most rented movies" << endl;
+	cout << "10) List the highest rated movies" << endl;
 	cin >> option;
+
 	return option;
 }
