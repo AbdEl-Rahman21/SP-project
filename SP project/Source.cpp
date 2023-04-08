@@ -36,18 +36,13 @@ void listMostRentedMovies();
 void save();
 void load();
 void listMostRatedMovies();
+int displayMenu();
 
 int main() {
-	int option;
-	cout << " Main Menu" << endl;
-	cout << "***********   " << endl;
-	cout << "Press" << endl;
-	cin >> option;
-	cout << "1) Add Movie" << endl << "2) Add customer" << endl << "3) List all customers" << endl << "4) List all movies" << endl << "5) List all rented movies" << endl <<
-		"6) Rent Movie" << endl << "7) Summary of overdue customers" << endl << "8) List most rented movies" << endl << "9) List the highest rated movies" << endl << "10) Return Movie" <<endl;
-
-	switch (option)
-	{
+	char answer;
+	do {
+		switch (displayMenu())
+		{
 	case 1: addMovie(); break;
 	case 2:addCustomer(); break;
 	case 3:listCustomers(); break;
@@ -58,8 +53,22 @@ int main() {
 	case 8:listMostRentedMovies(); break;
 	case 9:listMostRatedMovies(); break;
 	case 10:returnMovie(); break;
-	default: cout << "Invalid Input"; // lazm hena nzbt eno yrg3 lel options tani
+	default : cout << "Invalid Input"; answer = 'y';
 
 	}
-	return 0;
+	cout<< "Do you want to continue (Y/N) : ";
+	cin >> answer;
+}while (answer == 'Y' || answer == 'y');
+return 0;
+}
+int displayMenu()
+{
+	int option;
+	cout << " Main Menu" << endl;
+	cout << "***********   " << endl;
+	cout << "Press" << endl;
+	cout << "1) Add Movie" << endl << "2) Add customer" << endl << "3) List all customers" << endl << "4) List all movies" << endl << "5) List all rented movies" << endl <<
+		"6) Rent Movie" << endl << "7) Summary of overdue customers" << endl << "8) List most rented movies" << endl << "9) List the highest rated movies" << endl << "10) Return Movie" << endl;
+	cin >> option;
+	return option;
 }
