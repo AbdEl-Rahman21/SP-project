@@ -37,4 +37,28 @@ void save();
 void load();
 void listMostRatedMovies();
 
-int main() {}
+int main() {
+	int option;
+	cout << " Main Menu" << endl;
+	cout << "***********   " << endl;
+	cout << "Press" << endl;
+	cin >> option;
+	cout << "1) Add Movie" << endl << "2) Add customer" << endl << "3) List all customers" << endl << "4) List all movies" << endl << "5) List all rented movies" << endl <<
+		"6) Rent movie" << endl << "7) Summary of overdue customer" << endl << "8) List most rented movies" << endl << "9) List the highest rated movies" << endl;
+
+	switch (option)
+	{
+	case 1: addMovie(); break;
+	case 2:addCustomer(); break;
+	case 3:listCustomers(); break;
+	case 4:listMovies(); break;
+	case 5:listRentedMovies(); break;
+	case 6:rentMovie(); break;
+	case 7:listOverdueCustomers(); break;
+	case 8:listMostRentedMovies(); break;
+	case 9:listMostRatedMovies(); break;
+	default: cout << "Invalid Input";
+
+	}
+	return 0;
+}
