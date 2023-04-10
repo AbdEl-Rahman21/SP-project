@@ -21,7 +21,7 @@ int numberOfMovies = 0;
 struct customer {
 	string name = "\0";
 	string rentedMovie = "\0";
-	bool isOverdue = false;
+	bool isRenting = false;
 	tm rentDate = { 0 };	//To display dates add 1 to months and 1900 to years.
 	tm returnDate = { 0 };	//To display dates add 1 to months and 1900 to years.
 }customers[100];
@@ -29,7 +29,7 @@ struct customer {
 int numberOfCustomers = 0;
 
 int displayMenu();
-int getCustomerNumber();
+int getChoice(int numberOfChoices);
 void addMovie();
 void addCustomer();
 void listMovies();
@@ -133,9 +133,9 @@ void returnMovie() {
 	int daysdiff = 0;
 	int overdiff = 0;
 
-	listCustomers(); //change to list renting customers
+	listCustomers();	//change to list renting customers
 
-	customerIndex = getCustomerNumber();
+	customerIndex = getChoice(numberOfCustomers);	//change with listcutomers 
 
 	overdiff = difftime(time(NULL), mktime(&customers[customerIndex].returnDate)) / 86400;
 	daysdiff = ceil(difftime(mktime(&customers[customerIndex].returnDate), mktime(&customers[customerIndex].rentDate)) / 86400);
@@ -149,21 +149,21 @@ void returnMovie() {
 	cout << "Please pay: " << daysdiff * movies[movieIndex].price + overdiff * movies[movieIndex].overdueFee << endl;
 }
 
-int getCustomerNumber() {
+int getChoice(int numberOfChoices) {
 	int index = 0;
 
 	while (true) {
-		cout << "Enter customer number: ";
+		cout << "Enter your choice: ";
 
 		index = getValidNumber();
 
-		if (index > 0 && index <= numberOfCustomers) {
+		if (index > 0 && index <= numberOfChoices) {
 			--index;
 
 			break;
 		}
 
-		cout << "Error:Customer does not exist." << endl;
+		cout << "Error:Choice does not exist." << endl;
 	}
 
 	return index;
@@ -178,7 +178,7 @@ float getValidNumber() {
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-		cout << " Enter numbers only : ";
+		cout << "Enter numbers only : ";
 		cin >> number;
 	}
 
@@ -195,10 +195,11 @@ void resetCustomer(int customerIndex, int& movieIndex) {
 	}
 
 	customers[customerIndex].rentedMovie = "\0";
-	customers[customerIndex].isOverdue = false;
+	customers[customerIndex].isRenting = false;
 	customers[customerIndex].rentDate = { 0 };
 	customers[customerIndex].returnDate = { 0 };
 }
+
 void rentMovie()
 {
 	addCustomer();
