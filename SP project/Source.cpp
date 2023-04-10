@@ -178,7 +178,7 @@ float getValidNumber() {
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-		cout << "Enter numbers only: ";
+		cout << " Enter numbers only : ";
 		cin >> number;
 	}
 
@@ -202,27 +202,30 @@ void resetCustomer(int customerIndex, int& movieIndex) {
 void rentMovie()
 {
 	addCustomer();
-	int total;
+	int total,rent_index;
 	cout << " Here is a list of available movies to rent : " << endl << endl;
 	for (int i = 0; i < numberOfMovies; i++)
 	{
 
-		if (movies[i].isRented == false)
+		if (movies[i].isRented == false) 
+		{
+			rent_index++;
 			cout << "  " << i + 1 << ") "
-			<< movies[i].name
-			<< " |  Price per day :  " << movies[i].price
-			<< " |  Overdue Fee :  " << movies[i].overdueFee
-			<< " |  Rating :  " << movies[i].rating << "/5" << endl;
+				<< movies[i].name
+				<< " |  Price per day :  " << movies[i].price
+				<< " |  Overdue Fee :  " << movies[i].overdueFee
+				<< " |  Rating :  " << movies[i].rating << "/5" << endl;
+		}
 	}
 	int choice, days;
 	cout << endl << " Enter your movie number : ";
-	cin >> choice;
+	choice = getValidNumber();
 	cout << " Enter the number of days : ";
 	cin >> days;
-	if (choice > 0 && choice <= numberOfMovies)
+	if (choice > 0 && choice <= rent_index)
 	{
 		for (int j = 0; j < choice; j++)
-			total = movies[j].price * (days * 1.0);
+			total = movies[j].price * (days * numberOfMovies);
 		cout << " Your total price is : " << total << endl;
 		cout << "\t\t\t\t\t * Your film is rented successfully !  *" << endl;
 		movies[choice - 1].isRented = true;
