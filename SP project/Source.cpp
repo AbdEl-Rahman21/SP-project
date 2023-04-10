@@ -199,3 +199,33 @@ void resetCustomer(int customerIndex, int& movieIndex) {
 	customers[customerIndex].rentDate = { 0 };
 	customers[customerIndex].returnDate = { 0 };
 }
+void rentMovie(movie movies[])
+{
+	addCustomer();
+	int total;
+	cout << " Here is a list of available movies to rent : " << endl << endl;
+	for (int i = 0; i < numberOfMovies; i++)
+	{
+
+		if (movies[i].isRented == false)
+			cout << "  " << i + 1 << ") "
+			<< movies[i].name
+			<< " |  Price per day :  " << movies[i].price
+			<< " |  Overdue Fee :  " << movies[i].overdueFee
+			<< " |  Rating :  " << movies[i].rating << "/5" << endl;
+	}
+	int choice, days;
+	cout << endl << " Enter your movie number : ";
+	cin >> choice;
+	cout << " Enter the number of days : ";
+	cin >> days;
+	if (choice > 0 && choice <= numberOfMovies)
+	{
+		for (int j = 0; j < choice; j++)
+			total = movies[j].price * (days * 1.0);
+		cout << " Your total price is : " << total << endl;
+		cout << "\t\t\t\t\t * Your film is rented successfully !  *" << endl;
+		movies[choice - 1].isRented = true;
+		movies[choice - 1].timesRented++;
+	}
+}
