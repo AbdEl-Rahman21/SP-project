@@ -202,7 +202,7 @@ void resetCustomer(int customerIndex, int& movieIndex) {
 void rentMovie()
 {
 	addCustomer();
-	int total,rent_index;
+	int total,rent_index=0;
 	cout << " Here is a list of available movies to rent : " << endl << endl;
 	for (int i = 0; i < numberOfMovies; i++)
 	{
@@ -225,7 +225,7 @@ void rentMovie()
 	if (choice > 0 && choice <= rent_index)
 	{
 		for (int j = 0; j < choice; j++)
-			total = movies[j].price * (days * numberOfMovies);
+			total = movies[j].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
 		cout << "\t\t\t\t\t * Your film is rented successfully !  *" << endl;
 		movies[choice - 1].isRented = true;
