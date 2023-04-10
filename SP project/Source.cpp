@@ -199,7 +199,7 @@ void resetCustomer(int customerIndex, int& movieIndex) {
 	customers[customerIndex].rentDate = { 0 };
 	customers[customerIndex].returnDate = { 0 };
 }
-void rentMovie(movie movies[])
+void rentMovie()
 {
 	addCustomer();
 	int total;
