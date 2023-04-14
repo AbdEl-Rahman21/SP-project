@@ -12,7 +12,7 @@ struct movie {
 	float overdueFee = 0;
 	float rating = 0;	//From 0 to 10
 	int timesRented = 0;
-	int numberInStock = 0;	//Max of 5
+	int numberInStock = 5;	//Max of 5
 }movies[100];
 
 int numberOfMovies = 0;
@@ -244,7 +244,7 @@ void rentMovie()
 	for (int i = 0; i < numberOfMovies; i++)
 	{
 
-		if (movies[i].isRented == false) 
+		if (movies[i].numberInStock !=0) 
 		{
 			rent_index++;
 			cout << "  " << i + 1 << ") "
@@ -264,8 +264,9 @@ void rentMovie()
 		for (int j = 0; j < choice; j++)
 			total = movies[j].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
-		cout << "\t\t\t\t\t * Your film is rented successfully !  *" << endl;
-		movies[choice - 1].isRented = true;
+		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
 		movies[choice - 1].timesRented++;
+		movies[choice - 1].numberInStock--;
 	}
+	
 }
