@@ -2,31 +2,34 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include <array>
 #include <ctime>
 
 using namespace std;
 
 struct movie {
 	string name = "\0";
-	float price = 0;		//Per day
-	float overdueFee = 0;	//Per day
-	float rating = 0;		//From 0 to 5
-	bool isRented = false;
+	float price = 0;	//Both price and overdueFee are per day
+	float overdueFee = 0;
+	float rating = 0;	//From 0 to 10
 	int timesRented = 0;
+	int numberInStock = 0;	//Max of 5
 }movies[100];
 
 int numberOfMovies = 0;
 
 struct customer {
+	string id = "\0";
 	string name = "\0";
-	string rentedMovie = "\0";
-	bool isRenting = false;
-	tm rentDate = { 0 };	//To display dates add 1 to months and 1900 to years.
-	tm returnDate = { 0 };	//To display dates add 1 to months and 1900 to years.
+	string email = "\0";
+	string phoneNumber = "\0";
+	string rentedMovies[5] = { "\0" };	//Maybe vector or (get index of movie)/(is max?)/(get index of free)
+	int numberOfRentedMovies = 0;	//Max of 5
+	tm rentDate[5] = { 0 };	//To display dates add 1 to months and 1900 to years.
+	tm returnDate[5] = { 0 };
 }customers[100];
 
 int numberOfCustomers = 0;
+int factor = 0;
 
 int displayMenu();
 int getChoice(int numberOfChoices);
@@ -42,7 +45,9 @@ void listMostRentedMovies();
 void save();
 void load();
 void listMostRatedMovies();
-void resetCustomer(int customerIndex, int& movieIndex);
+void reset(int customerMovieIndex, int customerIndex, int& movieIndex);
+void listRentingCustomers();
+void listCustomerMovies(int customerIndex);
 float getValidNumber();
 
 int main() {
@@ -128,25 +133,54 @@ int displayMenu() {
 }
 
 void returnMovie() {
+	int customerMovieIndex = 0;
 	int customerIndex = 0;
 	int movieIndex = 0;
-	int daysdiff = 0;
-	int overdiff = 0;
+	int rentedDays = 0;
+	int overdueDays = 0;
+	
+	listRentingCustomers();
 
-	listCustomers();	//change to list renting customers
+	customerIndex = getChoice(numberOfCustomers - factor);
 
-	customerIndex = getChoice(numberOfCustomers);	//change with listcutomers 
+	listCustomerMovies(customerIndex);
 
-	overdiff = difftime(time(NULL), mktime(&customers[customerIndex].returnDate)) / 86400;
-	daysdiff = ceil(difftime(mktime(&customers[customerIndex].returnDate), mktime(&customers[customerIndex].rentDate)) / 86400);
+	customerMovieIndex = getChoice(5 - factor);
 
-	resetCustomer(customerIndex, movieIndex);
+	overdueDays = round(difftime(time(NULL), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
 
-	if (overdiff < 0) {
-		overdiff = 0;
+	rentedDays = round(difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
+		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400);
+
+	if (overdueDays < 0) {
+		overdueDays = 0;
 	}
 
-	cout << "Please pay: " << daysdiff * movies[movieIndex].price + overdiff * movies[movieIndex].overdueFee << endl;
+	reset(customerMovieIndex, customerIndex, movieIndex);
+
+	cout << "Your fee is: " << rentedDays * movies[movieIndex].price + overdueDays * movies[movieIndex].overdueFee << endl;
+}
+
+void listRentingCustomers() {
+	for (int i = 0; i < numberOfCustomers; ++i) {
+		if (customers[i].numberOfRentedMovies != 0) {
+			cout << ++i - factor << "- Name: " << customers[i].name << "\tId: " << customers[i].id << endl;
+		}
+		else {
+			++factor;
+		}
+	}
+}
+
+void listCustomerMovies(int customerIndex) {
+	for (int i = 0; i < 5; ++i) {
+		if (customers[customerIndex].rentedMovies[i] != "\0") {
+			cout << ++i - factor << "- " << customers[customerIndex].rentedMovies[i] << endl;
+		}
+		else {
+			++factor;
+		}
+	}
 }
 
 int getChoice(int numberOfChoices) {
@@ -158,13 +192,15 @@ int getChoice(int numberOfChoices) {
 		index = getValidNumber();
 
 		if (index > 0 && index <= numberOfChoices) {
-			--index;
+			--index + factor;
 
 			break;
 		}
 
 		cout << "Error:Choice does not exist." << endl;
 	}
+
+	factor = 0;
 
 	return index;
 }
@@ -185,19 +221,19 @@ float getValidNumber() {
 	return number;
 }
 
-void resetCustomer(int customerIndex, int& movieIndex) {
+void reset(int customerMovieIndex, int customerIndex, int& movieIndex) {
 	for (movieIndex; movieIndex < numberOfMovies; ++movieIndex) {
-		if (movies[movieIndex].name == customers[customerIndex].rentedMovie) {
-			movies[movieIndex].isRented = false;
+		if (movies[movieIndex].name == customers[customerIndex].rentedMovies[customerMovieIndex]) {
+			--movies[movieIndex].numberInStock;
 
 			break;
 		}
 	}
 
-	customers[customerIndex].rentedMovie = "\0";
-	customers[customerIndex].isRenting = false;
-	customers[customerIndex].rentDate = { 0 };
-	customers[customerIndex].returnDate = { 0 };
+	--customers[customerIndex].numberOfRentedMovies;
+	customers[customerIndex].rentedMovies[customerMovieIndex] = "\0";
+	customers[customerIndex].rentDate[customerMovieIndex] = { 0 };
+	customers[customerIndex].returnDate[customerMovieIndex] = { 0 };
 }
 
 void rentMovie()
