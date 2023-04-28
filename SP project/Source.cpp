@@ -18,7 +18,7 @@ struct movie {
 int numberOfMovies = 0;
 
 struct customer {
-	string id = "\0";
+	string id = "\0";         
 	string name = "\0";
 	string email = "\0";
 	string phoneNumber = "\0";
@@ -243,8 +243,34 @@ void reset(int customerMovieIndex, int customerIndex, int& movieIndex) {
 
 void rentMovie()
 {
-	addCustomer();
-	int total,rent_index=0;
+	int total, rent_index = 0,customer_index,freeM_index;
+		string _id;
+	char x;
+	cout << " Are you a new customer ? (Y/N)";
+	cin >> x;
+	if (x == 'y' || x == 'Y')
+	
+		addCustomer();
+	else
+		cout << " Enter your id : ";
+	cin >> _id;
+	for (int p = 0; p < numberOfCustomers; p++)
+	{
+		if (customers[p].id == _id && customers[p].numberOfRentedMovies < 6)
+		{
+			customer_index = p;
+		}
+		else
+			cout << " * Invalid id ! * " << endl;
+	}
+	for (int z = 0; z < 5; z++)
+	{
+		if (customers[customer_index].rentedMovies[z] == "\0")
+			freeM_index = z;
+	}
+	time_t current_date= time(NULL);
+	gmtime_s(&customers[customer_index].rentDate[freeM_index], &current_date);
+
 	cout << " Here is a list of available movies to rent : " << endl << endl;
 	for (int i = 0; i < numberOfMovies; i++)
 	{
@@ -264,12 +290,15 @@ void rentMovie()
 	choice = getValidNumber();
 	cout << " Enter the number of days : ";
 	cin >> days;
+	customers[customer_index].returnDate[freeM_index] = customers[customer_index].rentDate[freeM_index];
+	customers[customer_index].returnDate[freeM_index].tm_mday += days;
 	if (choice > 0 && choice <= rent_index)
 	{
 		for (int j = 0; j < choice; j++)
 			total = movies[j].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
 		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
+		cout << " Your deadline date : " << customers[customer_index].returnDate[freeM_index].tm_mday <<"/"<< customers[customer_index].returnDate[freeM_index].tm_mon+1<< "/" << customers[customer_index].returnDate[freeM_index].tm_year + 1900 << endl;
 		movies[choice - 1].timesRented++;
 		movies[choice - 1].numberInStock--;
 	}
