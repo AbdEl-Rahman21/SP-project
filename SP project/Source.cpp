@@ -42,8 +42,10 @@ void rentMovie();
 void returnMovie();
 void listOverdueCustomers();
 void listMostRentedMovies();
-void save();
-void load();
+void saveMovies();
+void loadMovies();
+void saveCustomers();
+void loadCustomers();
 void listMostRatedMovies();
 void reset(int customerMovieIndex, int customerIndex, int& movieIndex);
 void listRentingCustomers();
@@ -51,6 +53,8 @@ void listCustomerMovies(int customerIndex);
 float getValidNumber();
 
 int main() {
+	loadMovies();
+	loadCustomers();
 	char answer = '\0';
 
 	do {
@@ -107,7 +111,8 @@ int main() {
 		cout << "Press 'Y' to continue or any other key to exit: ";
 		cin >> answer;
 	} while (answer == 'Y' || answer == 'y');
-
+	saveMovies();
+	saveCustomers();
 	return 0;
 }
 
@@ -269,4 +274,103 @@ void rentMovie()
 		movies[choice - 1].numberInStock--;
 	}
 	
+}
+
+void saveMovies()
+{
+	ofstream moviefile;
+	moviefile.open("movies.txt", ios::out | ios::trunc);
+	moviefile << numberOfMovies << endl;
+	for (int i = 0 ; i < numberOfMovies ; i++)
+	{
+		moviefile << movies[i].name << endl;
+		moviefile << movies[i].price << "\t";
+		moviefile << movies[i].overdueFee << "\t";
+		moviefile << movies[i].rating << "\t";
+		moviefile << movies[i].timesRented << "\t";
+		moviefile << movies[i].numberInStock << "\t";
+	}
+	moviefile.close();
+}
+
+void loadMovies()
+{
+	ifstream moviefile;
+	moviefile.open("movies.txt", ios::in);
+	moviefile >> numberOfMovies;
+	for (int i = 0; i < numberOfMovies; i++)
+	{
+		getline (moviefile,movies[i].name);
+		moviefile >> movies[i].price ;
+		moviefile >> movies[i].overdueFee;
+		moviefile >> movies[i].rating;
+		moviefile >> movies[i].timesRented;
+		moviefile >> movies[i].numberInStock ;
+	}
+	moviefile.close();
+}
+
+void saveCustomers()
+{
+	ofstream customerfile;
+	customerfile.open("customer.txt", ios::out | ios::trunc);
+	customerfile << numberOfCustomers << endl;
+	for (int i = 0 ; i < numberOfCustomers ; i++)
+	{
+		customerfile << customers[i].name << endl;
+		customerfile << customers[i].id << "\t";
+		customerfile << customers[i].email << "\t";
+		customerfile << customers[i].phoneNumber << "\t";
+		customerfile << customers[i].numberOfRentedMovies << endl;
+		for (int j = 0; j < 5; j++)
+		{
+			if (customers[i].rentedMovies[j] != "\0")
+			{
+				customerfile << customers[i].rentedMovies[j] << endl;
+				customerfile << customers[i].rentDate[j].tm_hour << "\t";
+				customerfile << customers[i].rentDate[j].tm_mday << "\t";
+				customerfile << customers[i].rentDate[j].tm_mon << "\t";
+				customerfile << customers[i].rentDate[j].tm_year << "\t";
+				customerfile << customers[i].rentDate[j].tm_isdst << "\t";
+				customerfile << customers[i].returnDate[j].tm_hour << "\t";
+				customerfile << customers[i].returnDate[j].tm_mday << "\t";
+				customerfile << customers[i].returnDate[j].tm_mon << "\t";
+				customerfile << customers[i].returnDate[j].tm_year << "\t";
+				customerfile << customers[i].returnDate[j].tm_isdst << "\t";
+			}
+		}
+	}
+	customerfile.close();
+}
+
+void loadCustomers()
+{
+	ifstream customerfile;
+	customerfile.open("customer.txt", ios::in);
+	customerfile >> numberOfCustomers ;
+	for (int i = 0; i < numberOfCustomers; i++)
+	{
+		customerfile >> customers[i].name;
+		customerfile >> customers[i].id;
+		customerfile >> customers[i].email ;
+		customerfile >> customers[i].phoneNumber;
+		customerfile >> customers[i].numberOfRentedMovies;
+		for (int j = 0; j < customers[i].numberOfRentedMovies; j++)
+		{
+			
+			customerfile >> customers[i].rentedMovies[j];
+			customerfile >> customers[i].rentDate[j].tm_hour;
+			customerfile >> customers[i].rentDate[j].tm_mday;
+			customerfile >> customers[i].rentDate[j].tm_mon;
+			customerfile >> customers[i].rentDate[j].tm_year;
+			customerfile >> customers[i].rentDate[j].tm_isdst;
+			customerfile >> customers[i].returnDate[j].tm_hour;
+			customerfile >> customers[i].returnDate[j].tm_mday;
+			customerfile >> customers[i].returnDate[j].tm_mon;
+			customerfile >> customers[i].returnDate[j].tm_year;
+			customerfile >> customers[i].returnDate[j].tm_isdst;
+			
+		}
+	}
+	customerfile.close();
 }
