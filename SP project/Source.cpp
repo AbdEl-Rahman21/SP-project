@@ -437,3 +437,50 @@ void loadCustomers() {
 
 	customerfile.close();
 }
+
+void listOverdueCustomers()
+{
+	int overdueDays;
+	int rentedDays;
+	for (int i = 0; i < numberOfCustomers; i++)
+	{
+		bool isOverdue = false;
+		for (int j = 0; j < 5; j++)
+		{
+			if (customers[i].rentedMovies[j] != "\0")
+			{
+				
+				overdueDays = round(difftime(time(NULL), mktime(&customers[i].returnDate[j])) / 86400);
+				if (overdueDays > 0)
+				{
+					if (!isOverdue)
+					{
+						cout << customers[i].name << '\n';
+						cout << "id : " << customers[i].id << '\n';
+						cout << "Email : " << customers[i].email << '\n';
+						cout << "phone number : " << customers[i].phoneNumber << '\n';
+						isOverdue = true;
+					}
+					cout << customers[i].rentedMovies[j] << '\n';
+					rentedDays = round(difftime(mktime(&customers[i].returnDate[j]),
+						mktime(&customers[i].rentDate[j])) / 86400);
+					cout << "The customer is overdue by : "<<overdueDays << '\n';
+					for (int a = 0; a < numberOfMovies; a++)
+					{
+						if (customers[i].rentedMovies[j] == movies[a].name)
+						{
+							cout << "The total fee is: " << rentedDays *movies[a].price + overdueDays * movies[a].overdueFee << endl;
+							break;
+						}
+						
+
+					}
+					
+				}
+			}
+
+		}
+
+
+	}
+}
