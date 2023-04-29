@@ -20,7 +20,7 @@ struct movie {
 int numberOfMovies = 0;
 
 struct customer {
-	string id = "\0";
+	int id =0;   // same as array index
 	string name = "\0";
 	string email = "\0";
 	string phoneNumber = "\0";
@@ -265,28 +265,20 @@ void reset(int customerMovieIndex, int customerIndex, int& movieIndex) {
 
 void rentMovie()
 {
-	int total, rent_index = 0,customer_index,freeM_index;
-		string _id;
+	int total, movie_index = 0,customer_index,freeM_index;
 	char x;
+	bool valid_customer=false;
 	cout << " Are you a new customer ? (Y/N)";
 	cin >> x;
 	if (x == 'y' || x == 'Y')
-	
-		addCustomer();
-	else
-		cout << " Enter your id : ";
-	cin >> _id;
-	for (int p = 0; p < numberOfCustomers; p++)
 	{
-		if (customers[p].id == _id && customers[p].numberOfRentedMovies < 5)
-		
-
-			customer_index = p;
-		else
-
-			cout << " * Invalid id ! * " << endl;
-		
+		addCustomer();
+		customer_index = numberOfCustomers - 1;
 	}
+	else
+	customer_index=	Valid_Customer();
+	if (customer_index == -1)
+		return;
 	for (int z = 0; z < 5; z++)
 	{
 		if (customers[customer_index].rentedMovies[z] == "\0")
@@ -298,34 +290,74 @@ void rentMovie()
 	cout << " Here is a list of available movies to rent : " << endl << endl;
 	for (int i = 0; i < numberOfMovies; i++)
 	{
-
 		if (movies[i].numberInStock != 0)
 		{
-
-			cout << "  " << i + 1 << ") "
+			cout << "  " << i << ") "
 				<< movies[i].name
 				<< " |  Price per day :  " << movies[i].price
 				<< " |  Overdue Fee :  " << movies[i].overdueFee
 				<< " |  Rating :  " << movies[i].rating << "/5" << endl;
 		}
-		
 	}
-	int choice, days;
-	cout << endl << " Enter your movie number : ";
-	choice = getChoice(numberOfMovies-factor);
+	int days;
+	while (true)
+	{
+		
+		cout << endl << " Enter your movie number : ";
+		cin >> movie_index;
+		if (movies[movie_index].numberInStock != 0)
+			break;
+		else
+			cout << " Invalid choice";
+	}
 	cout << " Enter the number of days : ";
-	cin >> days;
+	 days=getValidNumber();
 	customers[customer_index].returnDate[freeM_index] = customers[customer_index].rentDate[freeM_index];
 	customers[customer_index].returnDate[freeM_index].tm_mday += days;
 	
-			total = movies[choice].price * (days * 1.0);
+			total = movies[movie_index].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
 		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
 		cout << " Your deadline date : " << customers[customer_index].returnDate[freeM_index].tm_mday <<"/"<< customers[customer_index].returnDate[freeM_index].tm_mon+1<< "/" << customers[customer_index].returnDate[freeM_index].tm_year + 1900 << endl;
-		movies[choice - 1].timesRented++;
-		movies[choice - 1].numberInStock--;
+		movies[movie_index].timesRented++;
+		movies[movie_index].numberInStock--;
+		customers[customer_index].rentedMovies[freeM_index] = movies[movie_index].name;
+		customers[customer_index].numberOfRentedMovies++;
+}
+int Valid_Customer()
+{
+	bool valid_id = false;
+	bool valid_quota = false;
+	int _id;
+
+	while (true)
+	{
+		cout << " Enter your id : ";
+		cin >> _id;
+		for (int k = 0; k < numberOfCustomers; k++)
+		{
+			if (customers[k].id == _id)
+			{
+				valid_id = true;
+				if (customers[k].numberOfRentedMovies < 5)
+				{
+					valid_quota = true;
+					return k;
+					break;
+				}
+
+			}
+		}
+		if (valid_id == true && valid_quota == false)
+		{
+			cout << " You have reached your max rent times";
+			return -1;
+		}
+		else if (valid_id == false)
+			cout << " Inavlid id ! ";
+
 	
-	
+	}
 }
 
 void saveMovies() {
@@ -484,3 +516,4 @@ void listOverdueCustomers()
 
 	}
 }
+
