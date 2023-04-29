@@ -2,9 +2,10 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include <ctime>
+#include <ctime>                         // 
 
-using namespace std;
+using namespace std;                
+
 
 struct movie {
 	string name = "\0";
@@ -13,6 +14,7 @@ struct movie {
 	float rating = 0;	//From 0 to 10
 	int timesRented = 0;
 	int numberInStock = 5;	//Max of 5
+	int numberinList=0;
 }movies[100];
 
 int numberOfMovies = 0;
@@ -256,12 +258,14 @@ void rentMovie()
 	cin >> _id;
 	for (int p = 0; p < numberOfCustomers; p++)
 	{
-		if (customers[p].id == _id && customers[p].numberOfRentedMovies < 6)
-		{
+		if (customers[p].id == _id && customers[p].numberOfRentedMovies < 5)
+		
+
 			customer_index = p;
-		}
 		else
+
 			cout << " * Invalid id ! * " << endl;
+		
 	}
 	for (int z = 0; z < 5; z++)
 	{
@@ -275,33 +279,32 @@ void rentMovie()
 	for (int i = 0; i < numberOfMovies; i++)
 	{
 
-		if (movies[i].numberInStock !=0) 
+		if (movies[i].numberInStock != 0)
 		{
-			rent_index++;
+
 			cout << "  " << i + 1 << ") "
 				<< movies[i].name
 				<< " |  Price per day :  " << movies[i].price
 				<< " |  Overdue Fee :  " << movies[i].overdueFee
 				<< " |  Rating :  " << movies[i].rating << "/5" << endl;
 		}
+		
 	}
 	int choice, days;
 	cout << endl << " Enter your movie number : ";
-	choice = getValidNumber();
+	choice = getChoice(numberOfMovies-factor);
 	cout << " Enter the number of days : ";
 	cin >> days;
 	customers[customer_index].returnDate[freeM_index] = customers[customer_index].rentDate[freeM_index];
 	customers[customer_index].returnDate[freeM_index].tm_mday += days;
-	if (choice > 0 && choice <= rent_index)
-	{
-		for (int j = 0; j < choice; j++)
-			total = movies[j].price * (days * 1.0);
+	
+			total = movies[choice].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
 		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
 		cout << " Your deadline date : " << customers[customer_index].returnDate[freeM_index].tm_mday <<"/"<< customers[customer_index].returnDate[freeM_index].tm_mon+1<< "/" << customers[customer_index].returnDate[freeM_index].tm_year + 1900 << endl;
 		movies[choice - 1].timesRented++;
 		movies[choice - 1].numberInStock--;
-	}
+	
 	
 }
 
