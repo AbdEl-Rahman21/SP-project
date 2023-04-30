@@ -2,16 +2,15 @@
 #include <fstream>
 #include <string>
 #include <limits>
-#include <ctime>                         // 
+#include <ctime>
 
-using namespace std;                
-
+using namespace std;
 
 struct movie {
 	string name = "\0";
 	float price = 0;	//Both price and overdueFee are per day
 	float overdueFee = 0;
-	float rating = 0;	//From 0 to 10
+	int rating = 0;	//From 1 to 10
 	int timesRented = 0;
 	int numberInStock = 5;	//Max of 5
 	int numberInList = 0;
@@ -20,11 +19,11 @@ struct movie {
 int numberOfMovies = 0;
 
 struct customer {
-	int id =0;   // same as array index
+	int id =0;	//same as array index
 	string name = "\0";
 	string email = "\0";
 	string phoneNumber = "\0";
-	string rentedMovies[5] = { "\0" };	//Maybe vector or (get index of movie)/(is max?)/(get index of free)
+	string rentedMovies[5] = { "\0" };
 	int numberOfRentedMovies = 0;	//Max of 5
 	int numberInList = 0;
 	tm rentDate[5] = { 0 };	//To display dates add 1 to months and 1900 to years.
@@ -122,8 +121,6 @@ int main() {
 }
 
 int displayMenu() {
-	int option = 0;
-
 	cout << "\t\tMain Menu" << endl;
 	cout << "\t\t***********" << endl;
 	cout << "Press:-" << endl;
@@ -137,9 +134,26 @@ int displayMenu() {
 	cout << "8) Summary of overdue customers" << endl;
 	cout << "9) List most rented movies" << endl;
 	cout << "10) List the highest rated movies" << endl;
-	cin >> option;
 
-	return option;
+	return getChoice(10);
+}
+
+void addMovie() {
+	cout << "Enter movie name: ";
+
+	cin.ignore();
+	getline(cin, movies[numberOfMovies].name);
+
+	cout << "Enter movie price: ";
+	movies[numberOfMovies].price = getValidNumber();
+
+	cout << "Enter movie overdue fee: ";
+	movies[numberOfMovies].overdueFee = getValidNumber();
+
+	cout << "Enter movie rating (max of 10): ";
+	movies[numberOfMovies].rating = getChoice(10);
+
+	++numberOfMovies;
 }
 
 void returnMovie() {
@@ -163,7 +177,7 @@ void returnMovie() {
 
 	reset(customerMovieIndex, customerIndex, movieIndex);
 
-	cout << "Your fee is: " << rentedDays * movies[movieIndex].price + overdueDays * movies[movieIndex].overdueFee << endl;
+	cout << "Total fee: " << rentedDays * movies[movieIndex].price + overdueDays * movies[movieIndex].overdueFee << endl;
 }
 
 int listRentingCustomers() {
@@ -228,7 +242,7 @@ int getChoice(int numberOfChoices) {
 		if (choice > 0 && choice <= numberOfChoices)
 			return choice;
 
-		cout << "Error:Choice does not exist." << endl;
+		cout << "Error: Choice does not exist." << endl;
 	}
 }
 
@@ -241,7 +255,7 @@ float getValidNumber() {
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-		cout << "Enter numbers only : ";
+		cout << "Enter numbers only: ";
 		cin >> number;
 	}
 
@@ -324,6 +338,7 @@ void rentMovie()
 		customers[customer_index].rentedMovies[freeM_index] = movies[movie_index].name;
 		customers[customer_index].numberOfRentedMovies++;
 }
+
 int Valid_Customer()
 {
 	bool valid_id = false;
@@ -373,7 +388,7 @@ void saveMovies() {
 		moviefile << movies[i].overdueFee << "\t";
 		moviefile << movies[i].rating << "\t";
 		moviefile << movies[i].timesRented << "\t";
-		moviefile << movies[i].numberInStock << "\t";
+		moviefile << movies[i].numberInStock << endl;
 	}
 
 	moviefile.close();
@@ -427,7 +442,7 @@ void saveCustomers() {
 				customerfile << customers[i].returnDate[j].tm_mday << "\t";
 				customerfile << customers[i].returnDate[j].tm_mon << "\t";
 				customerfile << customers[i].returnDate[j].tm_year << "\t";
-				customerfile << customers[i].returnDate[j].tm_isdst << "\t";
+				customerfile << customers[i].returnDate[j].tm_isdst << endl;
 			}
 		}
 	}
@@ -470,50 +485,44 @@ void loadCustomers() {
 	customerfile.close();
 }
 
-void listOverdueCustomers()
-{
-	int overdueDays;
-	int rentedDays;
-	for (int i = 0; i < numberOfCustomers; i++)
-	{
+void listOverdueCustomers() {
+	int overdueDays = 0;
+	int rentedDays = 0;
+
+	for (int i = 0; i < numberOfCustomers; ++i) {
 		bool isOverdue = false;
-		for (int j = 0; j < 5; j++)
-		{
-			if (customers[i].rentedMovies[j] != "\0")
-			{
-				
+
+		for (int j = 0; j < 5; ++j) {
+			if (customers[i].rentedMovies[j] != "\0") {
 				overdueDays = round(difftime(time(NULL), mktime(&customers[i].returnDate[j])) / 86400);
-				if (overdueDays > 0)
-				{
-					if (!isOverdue)
-					{
-						cout << customers[i].name << '\n';
-						cout << "id : " << customers[i].id << '\n';
-						cout << "Email : " << customers[i].email << '\n';
-						cout << "phone number : " << customers[i].phoneNumber << '\n';
+				rentedDays = round(difftime(mktime(&customers[i].returnDate[j]),
+					mktime(&customers[i].rentDate[j])) / 86400);
+
+				if (overdueDays > 0) {
+					if (!isOverdue) {
+						cout << "Name: " << customers[i].name << endl;
+						cout << "Id: " << customers[i].id << endl;
+						cout << "Email: " << customers[i].email << endl;
+						cout << "Phone number: " << customers[i].phoneNumber << endl;
+
 						isOverdue = true;
 					}
-					cout << customers[i].rentedMovies[j] << '\n';
-					rentedDays = round(difftime(mktime(&customers[i].returnDate[j]),
-						mktime(&customers[i].rentDate[j])) / 86400);
-					cout << "The customer is overdue by : "<<overdueDays << '\n';
-					for (int a = 0; a < numberOfMovies; a++)
-					{
-						if (customers[i].rentedMovies[j] == movies[a].name)
-						{
-							cout << "The total fee is: " << rentedDays *movies[a].price + overdueDays * movies[a].overdueFee << endl;
+
+					cout << "Movie name: " << customers[i].rentedMovies[j] << endl;
+					cout << "The customer is overdue by: " << overdueDays << endl;
+
+					for (int z = 0; z < numberOfMovies; ++z) {
+						if (customers[i].rentedMovies[j] == movies[z].name) {
+							cout << "Total fee: " << rentedDays * movies[z].price + overdueDays * movies[z].overdueFee << endl;
+
 							break;
 						}
-						
-
 					}
-					
 				}
 			}
-
 		}
 
-
+		if (isOverdue)
+			cout << "-------------------------------------" << endl;
 	}
 }
-
