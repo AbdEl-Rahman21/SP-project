@@ -21,6 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="movies.txt" />
-    <Text Include="customer.txt" />
+    <Text Include="customers.txt" />
   </ItemGroup>
 </Project>

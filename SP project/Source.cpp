@@ -19,7 +19,7 @@ struct movie {
 int numberOfMovies = 0;
 
 struct customer {
-	int id =0;	//same as array index
+	int id = 0;	//same as array index
 	string name = "\0";
 	string email = "\0";
 	string phoneNumber = "\0";
@@ -52,6 +52,7 @@ void reset(int customerMovieIndex, int customerIndex, int& movieIndex);
 int listRentingCustomers();
 int listCustomerMovies(int customerIndex);
 float getValidNumber();
+int ValidCustomer();
 
 int main() {
 	loadMovies();
@@ -60,6 +61,8 @@ int main() {
 	char answer = '\0';
 
 	do {
+		system("CLS");
+
 		switch (displayMenu()) {
 		case 1:
 			addMovie();
@@ -101,13 +104,6 @@ int main() {
 			listMostRatedMovies();
 
 			break;
-		default: 
-			cout << "Invalid choice!" << endl;
-			cout << "Please re - enter the correct one." << endl;
-
-			answer = 'y';
-
-			continue;
 		}
 
 		cout << "Press 'Y' to continue or any other key to exit: ";
@@ -121,7 +117,7 @@ int main() {
 }
 
 int displayMenu() {
-	cout << "\t\tMain Menu" << endl;
+	cout << "\t\t Main Menu" << endl;
 	cout << "\t\t***********" << endl;
 	cout << "Press:-" << endl;
 	cout << "1) Add Movie" << endl;
@@ -134,6 +130,7 @@ int displayMenu() {
 	cout << "8) Summary of overdue customers" << endl;
 	cout << "9) List most rented movies" << endl;
 	cout << "10) List the highest rated movies" << endl;
+	cout << "Enter your choice: ";
 
 	return getChoice(10);
 }
@@ -198,6 +195,8 @@ int listRentingCustomers() {
 		}
 	}
 
+	cout << "Enter your choice: ";
+
 	choice = getChoice(numberOfCustomers - factor);
 
 	for (int i = 0; i < numberOfCustomers; ++i)
@@ -224,6 +223,8 @@ int listCustomerMovies(int customerIndex) {
 		}
 	}
 
+	cout << "Enter your choice: ";
+
 	choice = getChoice(5 - factor);
 
 	for (int i = 0; i < 5; ++i)
@@ -235,14 +236,12 @@ int getChoice(int numberOfChoices) {
 	int choice = 0;
 
 	while (true) {
-		cout << "Enter your choice: ";
-
 		choice = getValidNumber();
 
 		if (choice > 0 && choice <= numberOfChoices)
 			return choice;
 
-		cout << "Error: Choice does not exist." << endl;
+		cout << "Error: Invalid input -- Please re - enter: ";
 	}
 }
 
@@ -290,7 +289,7 @@ void rentMovie()
 		customer_index = numberOfCustomers - 1;
 	}
 	else
-	customer_index=	Valid_Customer();
+	customer_index=	ValidCustomer();
 	if (customer_index == -1)
 		return;
 	for (int z = 0; z < 5; z++)
@@ -339,7 +338,7 @@ void rentMovie()
 		customers[customer_index].numberOfRentedMovies++;
 }
 
-int Valid_Customer()
+int ValidCustomer()
 {
 	bool valid_id = false;
 	bool valid_quota = false;
@@ -402,6 +401,7 @@ void loadMovies() {
 	moviefile >> numberOfMovies;
 
 	for (int i = 0; i < numberOfMovies; ++i) {
+		moviefile.ignore();
 		getline(moviefile, movies[i].name);
 
 		moviefile >> movies[i].price;
@@ -417,7 +417,7 @@ void loadMovies() {
 void saveCustomers() {
 	ofstream customerfile;
 
-	customerfile.open("customer.txt", ios::out | ios::trunc);
+	customerfile.open("customers.txt", ios::out | ios::trunc);
 
 	customerfile << numberOfCustomers << endl;
 
@@ -453,11 +453,12 @@ void saveCustomers() {
 void loadCustomers() {
 	ifstream customerfile;
 
-	customerfile.open("customer.txt", ios::in);
+	customerfile.open("customers.txt", ios::in);
 
 	customerfile >> numberOfCustomers;
 
 	for (int i = 0; i < numberOfCustomers; ++i) {
+		customerfile.ignore();
 		getline(customerfile, customers[i].name);
 
 		customerfile >> customers[i].id;
@@ -466,6 +467,7 @@ void loadCustomers() {
 		customerfile >> customers[i].numberOfRentedMovies;
 
 		for (int j = 0; j < customers[i].numberOfRentedMovies; ++j) {
+			customerfile.ignore();
 			getline(customerfile, customers[i].rentedMovies[j]);
 
 			customerfile >> customers[i].rentDate[j].tm_hour;
