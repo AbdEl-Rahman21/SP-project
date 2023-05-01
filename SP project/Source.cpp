@@ -10,7 +10,7 @@ struct movie {
 	string name = "\0";
 	float price = 0;	//Both price and overdueFee are per day
 	float overdueFee = 0;
-	float rating = 0;	//From 1 to 10
+	int rating = 0;	//From 1 to 10
 	int timesRented = 0;
 	int numberInStock = 5;	//Max of 5
 	int numberInList = 0;
@@ -244,7 +244,7 @@ void listMovies(movie movies[], int numberOfMovies) {
 	cout << "List of movies:-" << endl;
 
 	for (int i = 0; i < numberOfMovies; ++i) {
-		cout << " Name:" << movies[i].name << endl;
+		cout << " Name: " << movies[i].name << endl;
 		cout << " Number In Stock: " << movies[i].numberInStock << endl;
 		cout << " Price: " << movies[i].price << endl;
 		cout << " Overdue fee: " << movies[i].overdueFee << endl;
@@ -270,8 +270,8 @@ void listRentedMovies(movie movies[], int numberOfMovies) {
 	cout << "List of rented movies:-" << endl;
 
 	for (int i = 0; i < numberOfMovies; ++i) {
-		if (movies[i].timesRented > 0) {
-			cout << " Name:" << movies[i].name << endl;
+		if (movies[i].numberInStock > 0) {
+			cout << " Name: " << movies[i].name << endl;
 			cout << " Number In Stock: " << movies[i].numberInStock << endl;
 			cout << " Price: " << movies[i].price << endl;
 			cout << " Overdue fee: " << movies[i].overdueFee << endl;
