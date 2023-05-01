@@ -69,19 +69,19 @@ int main() {
 
 			break;
 		case 2:
-			addCustomer();
+			//addCustomer();
 
 			break;
 		case 3:
-			listCustomers();
+		//	listCustomers();
 
 			break;
 		case 4:
-			listMovies();
+		//	listMovies();
 
 			break;
 		case 5:
-			listRentedMovies();
+	//	listRentedMovies();
 
 			break;
 		case 6:
@@ -97,11 +97,11 @@ int main() {
 
 			break;
 		case 9:
-			listMostRentedMovies();
+//listMostRentedMovies();
 
 			break;
 		case 10:
-			listMostRatedMovies();
+		//	listMostRatedMovies();
 
 			break;
 		}
@@ -289,7 +289,7 @@ void rentMovie()
 	cin >> x;
 	if (x == 'y' || x == 'Y')
 	{
-		addCustomer();
+		//addCustomer();
 		customer_index = numberOfCustomers - 1;
 	}
 	else
