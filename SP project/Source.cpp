@@ -28,6 +28,7 @@ struct customer {
 	tm returnDate[5] = { 0 };
 };
 
+tm getCurrentTime();
 int displayMenu();
 int getChoice(int numberOfChoices);
 int listRentingCustomers(customer customers[], int numberOfCustomers);
@@ -159,13 +160,11 @@ void loadCustomers(customer customers[], int& numberOfCustomers) {
 			customerFile.ignore();
 			getline(customerFile, customers[i].rentedMovies[j]);
 
-			customerFile >> customers[i].rentDate[j].tm_hour;
 			customerFile >> customers[i].rentDate[j].tm_mday;
 			customerFile >> customers[i].rentDate[j].tm_mon;
 			customerFile >> customers[i].rentDate[j].tm_year;
 			customerFile >> customers[i].rentDate[j].tm_isdst;
 
-			customerFile >> customers[i].returnDate[j].tm_hour;
 			customerFile >> customers[i].returnDate[j].tm_mday;
 			customerFile >> customers[i].returnDate[j].tm_mon;
 			customerFile >> customers[i].returnDate[j].tm_year;
@@ -292,7 +291,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	int customerIndex = 0;
 	int freeMovieIndex = 0;
 	char choice = '\0';
-	time_t currentDate = time(NULL);
+	time_t temp = 0;
 
 	cout << "Add a new customer? (Press 'Y' for yes or any other key for no): ";
 	cin >> choice;
@@ -317,7 +316,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 		}
 	}
 
-	localtime_s(&customers[customerIndex].rentDate[freeMovieIndex], &currentDate);
+	customers[customerIndex].rentDate[freeMovieIndex] = getCurrentTime();
 
 	cout << "List of available movies:-" << endl;
 
@@ -356,8 +355,8 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 
 	cout << "Total fee: " << movies[movieIndex].price * days << " L.E" << endl;
 
-	currentDate = mktime(&customers[customerIndex].returnDate[freeMovieIndex]);
-	localtime_s(&customers[customerIndex].returnDate[freeMovieIndex], &currentDate);
+	temp = mktime(&customers[customerIndex].returnDate[freeMovieIndex]);
+	localtime_s(&customers[customerIndex].returnDate[freeMovieIndex], &temp);
 
 	cout << "Deadline is: " << customers[customerIndex].returnDate[freeMovieIndex].tm_mday;
 	cout << "/" << customers[customerIndex].returnDate[freeMovieIndex].tm_mon + 1;
@@ -394,18 +393,30 @@ int validCustomer(customer customers[], int numberOfCustomers) {
 	}
 }
 
+tm getCurrentTime() {
+	time_t temp1 = time(NULL);
+	tm temp2 = { 0 };
+
+	localtime_s(&temp2, &temp1);
+
+	temp2.tm_hour = 0;
+
+	return temp2;
+}
+
 void returnMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
 	int customerMovieIndex = 0;
 	int customerIndex = 0;
 	int movieIndex = 0;
 	int rentedDays = 0;
 	int overdueDays = 0;
+	tm temp = getCurrentTime();
 
 	customerIndex = listRentingCustomers(customers, numberOfCustomers);
 
 	customerMovieIndex = listCustomerMovies(customers, customerIndex);
 
-	overdueDays = round(difftime(time(NULL), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
+	overdueDays = round(difftime(mktime(&temp), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
 
 	rentedDays = difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
 		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400;
@@ -495,15 +506,16 @@ void reset(movie movies[], customer customers[], int numberOfMovies, int custome
 void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
 	int overdueDays = 0;
 	int rentedDays = 0;
+	tm temp = getCurrentTime();
 
 	for (int i = 0; i < numberOfCustomers; ++i) {
 		bool isOverdue = false;
 
 		for (int j = 0; j < 5; ++j) {
 			if (customers[i].rentedMovies[j] != "\0") {
-				overdueDays = round(difftime(time(NULL), mktime(&customers[i].returnDate[j])) / 86400);
-				rentedDays = round(difftime(mktime(&customers[i].returnDate[j]),
-					mktime(&customers[i].rentDate[j])) / 86400);
+				overdueDays = round(difftime(mktime(&temp), mktime(&customers[i].returnDate[j])) / 86400);
+				rentedDays = difftime(mktime(&customers[i].returnDate[j]),
+					mktime(&customers[i].rentDate[j])) / 86400;
 
 				if (overdueDays > 0) {
 					if (!isOverdue) {
@@ -516,7 +528,7 @@ void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovi
 					}
 
 					cout << "Movie name: " << customers[i].rentedMovies[j] << endl;
-					cout << "The customer is overdue by: " << overdueDays << endl;
+					cout << "The customer is overdue by: " << overdueDays << " days" << endl;
 
 					for (int z = 0; z < numberOfMovies; ++z) {
 						if (customers[i].rentedMovies[j] == movies[z].name) {
@@ -571,13 +583,11 @@ void saveCustomers(customer customers[], int numberOfCustomers) {
 			if (customers[i].rentedMovies[j] != "\0") {
 				customerFile << customers[i].rentedMovies[j] << endl;
 
-				customerFile << customers[i].rentDate[j].tm_hour << "\t";
 				customerFile << customers[i].rentDate[j].tm_mday << "\t";
 				customerFile << customers[i].rentDate[j].tm_mon << "\t";
 				customerFile << customers[i].rentDate[j].tm_year << "\t";
 				customerFile << customers[i].rentDate[j].tm_isdst << "\t";
 
-				customerFile << customers[i].returnDate[j].tm_hour << "\t";
 				customerFile << customers[i].returnDate[j].tm_mday << "\t";
 				customerFile << customers[i].returnDate[j].tm_mon << "\t";
 				customerFile << customers[i].returnDate[j].tm_year << "\t";
