@@ -14,58 +14,58 @@ struct movie {
 	int timesRented = 0;
 	int numberInStock = 5;	//Max of 5
 	int numberInList = 0;
-}movies[100];
-
-int numberOfMovies = 0;
+};
 
 struct customer {
-	int id = 0;	//same as array index
 	string name = "\0";
 	string email = "\0";
-	int phoneNumber = 0;
 	string rentedMovies[5] = { "\0" };
+	int id = 0;	//Same as array index
+	int phoneNumber = 0;
 	int numberOfRentedMovies = 0;	//Max of 5
 	int numberInList = 0;
 	tm rentDate[5] = { 0 };	//To display dates add 1 to months and 1900 to years.
 	tm returnDate[5] = { 0 };
-}customers[100];
-
-int numberOfCustomers = 0;
+};
 
 int displayMenu();
 int getChoice(int numberOfChoices);
-int listRentingCustomers();
-int listCustomerMovies(int customerIndex);
-int validCustomer();
-void addMovie();
+int listRentingCustomers(customer customers[], int numberOfCustomers);
+int listCustomerMovies(customer customers[], int customerIndex);
+int validCustomer(customer customers[], int numberOfCustomers);
+void addMovie(movie movies[], int& numberOfMovies);
 void addCustomer();
-void listMovies();
-void listCustomers();
-void listRentedMovies();
-void rentMovie();
-void returnMovie();
-void listOverdueCustomers();
+void listMovies(movie movies[], int numberOfMovies);
+void listCustomers(customer customers[], int numberOfCustomers);
+void listRentedMovies(movie movies[], int numberOfMovies);
+void rentMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
+void returnMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
+void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
 void listMostRentedMovies();
-void saveMovies();
-void loadMovies();
-void saveCustomers();
-void loadCustomers();
+void saveMovies(movie movies[], int numberOfMovies);
+void loadMovies(movie movies[], int& numberOfMovies);
+void saveCustomers(customer customers[], int numberOfCustomers);
+void loadCustomers(customer customers[], int& numberOfCustomers);
 void listMostRatedMovies();
-void reset(int customerMovieIndex, int customerIndex, int& movieIndex);
+void reset(movie movies[], customer customers[], int numberOfMovies, int customerMovieIndex, int customerIndex, int& movieIndex);
 float getValidNumber();
 
 int main() {
-	loadMovies();
-	loadCustomers();
-
+	int numberOfMovies = 0;
+	int numberOfCustomers = 0;
 	char answer = '\0';
+	movie movies[100];
+	customer customers[100];
+
+	loadMovies(movies, numberOfMovies);
+	loadCustomers(customers, numberOfCustomers);
 
 	do {
 		system("CLS");
 
 		switch (displayMenu()) {
 		case 1:
-			addMovie();
+			addMovie(movies, numberOfMovies);
 
 			break;
 		case 2:
@@ -73,27 +73,27 @@ int main() {
 
 			break;
 		case 3:
-			listCustomers();
+			listMovies(movies, numberOfMovies);
 
 			break;
 		case 4:
-			listMovies();
+			listCustomers(customers, numberOfCustomers);
 
 			break;
 		case 5:
-			listRentedMovies();
+			listRentedMovies(movies, numberOfMovies);
 
 			break;
 		case 6:
-			rentMovie();
+			rentMovie(movies, customers, numberOfMovies, numberOfCustomers);
 
 			break;
 		case 7:
-			returnMovie();
+			returnMovie(movies, customers, numberOfMovies, numberOfCustomers);
 
 			break;
 		case 8:
-			listOverdueCustomers();
+			listOverdueCustomers(movies, customers, numberOfMovies, numberOfCustomers);
 
 			break;
 		case 9:
@@ -110,10 +110,68 @@ int main() {
 		cin >> answer;
 	} while (answer == 'Y' || answer == 'y');
 
-	saveMovies();
-	saveCustomers();
+	saveMovies(movies, numberOfMovies);
+	saveCustomers(customers, numberOfCustomers);
 
 	return 0;
+}
+
+void loadMovies(movie movies[], int& numberOfMovies) {
+	ifstream movieFile;
+
+	movieFile.open("movies.txt", ios::in);
+
+	movieFile >> numberOfMovies;
+
+	for (int i = 0; i < numberOfMovies; ++i) {
+		movieFile.ignore();
+		getline(movieFile, movies[i].name);
+
+		movieFile >> movies[i].price;
+		movieFile >> movies[i].overdueFee;
+		movieFile >> movies[i].rating;
+		movieFile >> movies[i].timesRented;
+		movieFile >> movies[i].numberInStock;
+	}
+
+	movieFile.close();
+}
+
+void loadCustomers(customer customers[], int& numberOfCustomers) {
+	ifstream customerFile;
+
+	customerFile.open("customers.txt", ios::in);
+
+	customerFile >> numberOfCustomers;
+
+	for (int i = 0; i < numberOfCustomers; ++i) {
+		customerFile.ignore();
+		getline(customerFile, customers[i].name);
+
+		customerFile >> customers[i].id;
+		customerFile >> customers[i].email;
+		customerFile >> customers[i].phoneNumber;
+		customerFile >> customers[i].numberOfRentedMovies;
+
+		for (int j = 0; j < customers[i].numberOfRentedMovies; ++j) {
+			customerFile.ignore();
+			getline(customerFile, customers[i].rentedMovies[j]);
+
+			customerFile >> customers[i].rentDate[j].tm_hour;
+			customerFile >> customers[i].rentDate[j].tm_mday;
+			customerFile >> customers[i].rentDate[j].tm_mon;
+			customerFile >> customers[i].rentDate[j].tm_year;
+			customerFile >> customers[i].rentDate[j].tm_isdst;
+
+			customerFile >> customers[i].returnDate[j].tm_hour;
+			customerFile >> customers[i].returnDate[j].tm_mday;
+			customerFile >> customers[i].returnDate[j].tm_mon;
+			customerFile >> customers[i].returnDate[j].tm_year;
+			customerFile >> customers[i].returnDate[j].tm_isdst;
+		}
+	}
+
+	customerFile.close();
 }
 
 int displayMenu() {
@@ -122,8 +180,8 @@ int displayMenu() {
 	cout << "Press:-" << endl;
 	cout << "1) Add Movie" << endl;
 	cout << "2) Add customer" << endl;
-	cout << "3) List all customers" << endl;
-	cout << "4) List all movies" << endl;
+	cout << "3) List all movies" << endl;
+	cout << "4) List all customers" << endl;
 	cout << "5) List all rented movies" << endl;
 	cout << "6) Rent Movie" << endl;
 	cout << "7) Return Movie" << endl;
@@ -135,7 +193,7 @@ int displayMenu() {
 	return getChoice(10);
 }
 
-void addMovie() {
+void addMovie(movie movies[], int& numberOfMovies) {
 	cout << "Enter movie name: ";
 
 	cin.ignore();
@@ -151,102 +209,6 @@ void addMovie() {
 	movies[numberOfMovies].rating = getChoice(10);
 
 	++numberOfMovies;
-}
-
-void returnMovie() {
-	int customerMovieIndex = 0;
-	int customerIndex = 0;
-	int movieIndex = 0;
-	int rentedDays = 0;
-	int overdueDays = 0;
-
-	customerIndex = listRentingCustomers();
-
-	customerMovieIndex = listCustomerMovies(customerIndex);
-
-	overdueDays = round(difftime(time(NULL), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
-
-	rentedDays = round(difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
-		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400);
-
-	if (overdueDays < 0)
-		overdueDays = 0;
-
-	reset(customerMovieIndex, customerIndex, movieIndex);
-
-	cout << "Total fee: " << rentedDays * movies[movieIndex].price + overdueDays * movies[movieIndex].overdueFee << " L.E" << endl;
-}
-
-int listRentingCustomers() {
-	int factor = 0;
-	int listNumber = 0;
-	int choice = 0;
-
-	cout << "Renting customers:-" << endl;
-
-	for (int i = 0; i < numberOfCustomers; ++i) {
-		if (customers[i].numberOfRentedMovies != 0) {
-			listNumber = i + 1 - factor;
-
-			cout << " " << listNumber << ") Name: " << customers[i].name << " | Id: " << customers[i].id << endl;
-
-			customers[i].numberInList = listNumber;
-		}
-		else {
-			++factor;
-		}
-	}
-
-	cout << "Enter your choice: ";
-
-	choice = getChoice(numberOfCustomers - factor);
-
-	for (int i = 0; i < numberOfCustomers; ++i)
-		if (customers[i].numberInList == choice)
-			return i;
-}
-
-int listCustomerMovies(int customerIndex) {
-	int numberOfMoviesInList[5] = { 0 };
-	int listNumber = 0;
-	int factor = 0;
-	int choice = 0;
-
-	cout << "Customer movies:-" << endl;
-
-	for (int i = 0; i < 5; ++i) {
-		if (customers[customerIndex].rentedMovies[i] != "\0") {
-			listNumber = i + 1 - factor;
-
-			cout << " " << listNumber << ") " << customers[customerIndex].rentedMovies[i] << endl;
-
-			numberOfMoviesInList[i] = listNumber;
-		}
-		else {
-			++factor;
-		}
-	}
-
-	cout << "Enter your choice: ";
-
-	choice = getChoice(5 - factor);
-
-	for (int i = 0; i < 5; ++i)
-		if (numberOfMoviesInList[i] == choice)
-			return i;
-}
-
-int getChoice(int numberOfChoices) {
-	int choice = 0;
-
-	while (true) {
-		choice = getValidNumber();
-
-		if (choice > 0 && choice <= numberOfChoices)
-			return choice;
-
-		cout << "Error: Invalid input -- Please re - enter: ";
-	}
 }
 
 float getValidNumber() {
@@ -265,22 +227,62 @@ float getValidNumber() {
 	return number;
 }
 
-void reset(int customerMovieIndex, int customerIndex, int& movieIndex) {
-	for (movieIndex; movieIndex < numberOfMovies; ++movieIndex) {
-		if (movies[movieIndex].name == customers[customerIndex].rentedMovies[customerMovieIndex]) {
-			++movies[movieIndex].numberInStock;
+int getChoice(int numberOfChoices) {
+	int choice = 0;
 
-			break;
-		}
+	while (true) {
+		choice = getValidNumber();
+
+		if (choice > 0 && choice <= numberOfChoices)
+			return choice;
+
+		cout << "Error: Invalid input -- Please re - enter: ";
 	}
-
-	--customers[customerIndex].numberOfRentedMovies;
-	customers[customerIndex].rentedMovies[customerMovieIndex] = "\0";
-	customers[customerIndex].rentDate[customerMovieIndex] = { 0 };
-	customers[customerIndex].returnDate[customerMovieIndex] = { 0 };
 }
 
-void rentMovie() {
+void listMovies(movie movies[], int numberOfMovies) {
+	cout << "List of movies:-" << endl;
+
+	for (int i = 0; i < numberOfMovies; ++i) {
+		cout << " Name:" << movies[i].name << endl;
+		cout << " Number In Stock: " << movies[i].numberInStock << endl;
+		cout << " Price: " << movies[i].price << endl;
+		cout << " Overdue fee: " << movies[i].overdueFee << endl;
+		cout << " Times rented: " << movies[i].timesRented << endl;
+		cout << " Rating: " << movies[i].rating << "/10" << endl;
+		cout << " ---------------------------------------------" << endl;
+	}
+}
+
+void listCustomers(customer customers[], int numberOfCustomers) {
+	cout << "List of customer:-" << endl;
+
+	for (int i = 0; i < numberOfCustomers; ++i) {
+		cout << " Name: " << customers[i].name << endl;
+		cout << " Id: " << customers[i].id << endl;
+		cout << " Email: " << customers[i].email << endl;
+		cout << " Phone number: " << customers[i].phoneNumber << endl;
+		cout << " ---------------------------------------------" << endl;
+	}
+}
+
+void listRentedMovies(movie movies[], int numberOfMovies) {
+	cout << "List of rented movies:-" << endl;
+
+	for (int i = 0; i < numberOfMovies; ++i) {
+		if (movies[i].timesRented > 0) {
+			cout << " Name:" << movies[i].name << endl;
+			cout << " Number In Stock: " << movies[i].numberInStock << endl;
+			cout << " Price: " << movies[i].price << endl;
+			cout << " Overdue fee: " << movies[i].overdueFee << endl;
+			cout << " Times rented: " << movies[i].timesRented << endl;
+			cout << " Rating: " << movies[i].rating << "/10" << endl;
+			cout << " ---------------------------------------------" << endl;
+		}
+	}
+}
+
+void rentMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
 	int days = 0;
 	int movieIndex = 0;
 	int customerIndex = 0;
@@ -296,7 +298,7 @@ void rentMovie() {
 		customerIndex = numberOfCustomers - 1;
 	}
 	else {
-		customerIndex = validCustomer();
+		customerIndex = validCustomer(customers, numberOfCustomers);
 	}
 
 	if (customerIndex == -1)
@@ -339,7 +341,7 @@ void rentMovie() {
 	customers[customerIndex].returnDate[freeMovieIndex] = customers[customerIndex].rentDate[freeMovieIndex];
 	customers[customerIndex].returnDate[freeMovieIndex].tm_mday += days;
 
-	cout << "Total fee: " << movies[movieIndex].price * days << endl;
+	cout << "Total fee: " << movies[movieIndex].price * days << " L.E" << endl;
 
 	currentDate = mktime(&customers[customerIndex].returnDate[freeMovieIndex]);
 	localtime_s(&customers[customerIndex].returnDate[freeMovieIndex], &currentDate);
@@ -354,7 +356,7 @@ void rentMovie() {
 	customers[customerIndex].rentedMovies[freeMovieIndex] = movies[movieIndex].name;
 }
 
-int validCustomer() {
+int validCustomer(customer customers[], int numberOfCustomers) {
 	bool validId = false;
 	bool validQuota = false;
 	int id = 0;
@@ -386,120 +388,105 @@ int validCustomer() {
 	}
 }
 
-void saveMovies() {
-	ofstream moviefile;
+void returnMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
+	int customerMovieIndex = 0;
+	int customerIndex = 0;
+	int movieIndex = 0;
+	int rentedDays = 0;
+	int overdueDays = 0;
 
-	moviefile.open("movies.txt", ios::out | ios::trunc);
+	customerIndex = listRentingCustomers(customers, numberOfCustomers);
 
-	moviefile << numberOfMovies << endl;
+	customerMovieIndex = listCustomerMovies(customers, customerIndex);
 
-	for (int i = 0; i < numberOfMovies; ++i) {
-		moviefile << movies[i].name << endl;
-		moviefile << movies[i].price << "\t";
-		moviefile << movies[i].overdueFee << "\t";
-		moviefile << movies[i].rating << "\t";
-		moviefile << movies[i].timesRented << "\t";
-		moviefile << movies[i].numberInStock << endl;
-	}
+	overdueDays = round(difftime(time(NULL), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
 
-	moviefile.close();
+	rentedDays = round(difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
+		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400);
+
+	if (overdueDays < 0)
+		overdueDays = 0;
+
+	reset(movies, customers, numberOfMovies, customerMovieIndex, customerIndex, movieIndex);
+
+	cout << "Total fee: " << rentedDays * movies[movieIndex].price + overdueDays * movies[movieIndex].overdueFee << " L.E" << endl;
 }
 
-void loadMovies() {
-	ifstream moviefile;
+int listRentingCustomers(customer customers[], int numberOfCustomers) {
+	int factor = 0;
+	int listNumber = 0;
+	int choice = 0;
 
-	moviefile.open("movies.txt", ios::in);
-
-	moviefile >> numberOfMovies;
-
-	for (int i = 0; i < numberOfMovies; ++i) {
-		moviefile.ignore();
-		getline(moviefile, movies[i].name);
-
-		moviefile >> movies[i].price;
-		moviefile >> movies[i].overdueFee;
-		moviefile >> movies[i].rating;
-		moviefile >> movies[i].timesRented;
-		moviefile >> movies[i].numberInStock;
-	}
-
-	moviefile.close();
-}
-
-void saveCustomers() {
-	ofstream customerfile;
-
-	customerfile.open("customers.txt", ios::out | ios::trunc);
-
-	customerfile << numberOfCustomers << endl;
+	cout << "Renting customers:-" << endl;
 
 	for (int i = 0; i < numberOfCustomers; ++i) {
-		customerfile << customers[i].name << endl;
-		customerfile << customers[i].id << "\t";
-		customerfile << customers[i].email << "\t";
-		customerfile << customers[i].phoneNumber << "\t";
-		customerfile << customers[i].numberOfRentedMovies << endl;
+		if (customers[i].numberOfRentedMovies != 0) {
+			listNumber = i + 1 - factor;
 
-		for (int j = 0; j < 5; ++j) {
-			if (customers[i].rentedMovies[j] != "\0") {
-				customerfile << customers[i].rentedMovies[j] << endl;
+			cout << listNumber << ") Name: " << customers[i].name << " | Id: " << customers[i].id << endl;
 
-				customerfile << customers[i].rentDate[j].tm_hour << "\t";
-				customerfile << customers[i].rentDate[j].tm_mday << "\t";
-				customerfile << customers[i].rentDate[j].tm_mon << "\t";
-				customerfile << customers[i].rentDate[j].tm_year << "\t";
-				customerfile << customers[i].rentDate[j].tm_isdst << "\t";
-
-				customerfile << customers[i].returnDate[j].tm_hour << "\t";
-				customerfile << customers[i].returnDate[j].tm_mday << "\t";
-				customerfile << customers[i].returnDate[j].tm_mon << "\t";
-				customerfile << customers[i].returnDate[j].tm_year << "\t";
-				customerfile << customers[i].returnDate[j].tm_isdst << endl;
-			}
+			customers[i].numberInList = listNumber;
+		}
+		else {
+			++factor;
 		}
 	}
 
-	customerfile.close();
+	cout << "Enter your choice: ";
+
+	choice = getChoice(numberOfCustomers - factor);
+
+	for (int i = 0; i < numberOfCustomers; ++i)
+		if (customers[i].numberInList == choice)
+			return i;
 }
 
-void loadCustomers() {
-	ifstream customerfile;
-	
-	customerfile.open("customers.txt", ios::in);
+int listCustomerMovies(customer customers[], int customerIndex) {
+	int numberOfMoviesInList[5] = { 0 };
+	int listNumber = 0;
+	int factor = 0;
+	int choice = 0;
 
-	customerfile >> numberOfCustomers;
+	cout << "Customer movies:-" << endl;
 
-	for (int i = 0; i < numberOfCustomers; ++i) {
-		customerfile.ignore();
-		getline(customerfile, customers[i].name);
+	for (int i = 0; i < 5; ++i) {
+		if (customers[customerIndex].rentedMovies[i] != "\0") {
+			listNumber = i + 1 - factor;
 
-		customerfile >> customers[i].id;
-		customerfile >> customers[i].email;
-		customerfile >> customers[i].phoneNumber;
-		customerfile >> customers[i].numberOfRentedMovies;
+			cout << listNumber << ") " << customers[customerIndex].rentedMovies[i] << endl;
 
-		for (int j = 0; j < customers[i].numberOfRentedMovies; ++j) {
-			customerfile.ignore();
-			getline(customerfile, customers[i].rentedMovies[j]);
-
-			customerfile >> customers[i].rentDate[j].tm_hour;
-			customerfile >> customers[i].rentDate[j].tm_mday;
-			customerfile >> customers[i].rentDate[j].tm_mon;
-			customerfile >> customers[i].rentDate[j].tm_year;
-			customerfile >> customers[i].rentDate[j].tm_isdst;
-
-			customerfile >> customers[i].returnDate[j].tm_hour;
-			customerfile >> customers[i].returnDate[j].tm_mday;
-			customerfile >> customers[i].returnDate[j].tm_mon;
-			customerfile >> customers[i].returnDate[j].tm_year;
-			customerfile >> customers[i].returnDate[j].tm_isdst;
+			numberOfMoviesInList[i] = listNumber;
+		}
+		else {
+			++factor;
 		}
 	}
 
-	customerfile.close();
+	cout << "Enter your choice: ";
+
+	choice = getChoice(5 - factor);
+
+	for (int i = 0; i < 5; ++i)
+		if (numberOfMoviesInList[i] == choice)
+			return i;
 }
 
-void listOverdueCustomers() {
+void reset(movie movies[], customer customers[], int numberOfMovies, int customerMovieIndex, int customerIndex, int& movieIndex) {
+	for (movieIndex; movieIndex < numberOfMovies; ++movieIndex) {
+		if (movies[movieIndex].name == customers[customerIndex].rentedMovies[customerMovieIndex]) {
+			++movies[movieIndex].numberInStock;
+
+			break;
+		}
+	}
+
+	--customers[customerIndex].numberOfRentedMovies;
+	customers[customerIndex].rentedMovies[customerMovieIndex] = "\0";
+	customers[customerIndex].rentDate[customerMovieIndex] = { 0 };
+	customers[customerIndex].returnDate[customerMovieIndex] = { 0 };
+}
+
+void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
 	int overdueDays = 0;
 	int rentedDays = 0;
 
@@ -527,7 +514,7 @@ void listOverdueCustomers() {
 
 					for (int z = 0; z < numberOfMovies; ++z) {
 						if (customers[i].rentedMovies[j] == movies[z].name) {
-							cout << "Total fee: " << rentedDays * movies[z].price + overdueDays * movies[z].overdueFee << endl;
+							cout << "Total fee: " << rentedDays * movies[z].price + overdueDays * movies[z].overdueFee << " L.E" << endl;
 
 							break;
 						}
@@ -541,44 +528,57 @@ void listOverdueCustomers() {
 	}
 }
 
-void listMovies() {
-	cout << "List of movies:-" << endl;
+void saveMovies(movie movies[], int numberOfMovies) {
+	ofstream movieFile;
+
+	movieFile.open("movies.txt", ios::out | ios::trunc);
+
+	movieFile << numberOfMovies << endl;
 
 	for (int i = 0; i < numberOfMovies; ++i) {
-		cout << " Name:" << movies[i].name << endl;
-		cout << " Number In Stock: " << movies[i].numberInStock << endl;
-		cout << " Price: " << movies[i].price << endl;
-		cout << " Overdue fee: " << movies[i].overdueFee << endl;
-		cout << " Times rented: " << movies[i].timesRented << endl;
-		cout << " Rating: " << movies[i].rating << "/10" << endl;
-		cout << " ---------------------------------------------" << endl;
+		movieFile << movies[i].name << endl;
+		movieFile << movies[i].price << "\t";
+		movieFile << movies[i].overdueFee << "\t";
+		movieFile << movies[i].rating << "\t";
+		movieFile << movies[i].timesRented << "\t";
+		movieFile << movies[i].numberInStock << endl;
 	}
+
+	movieFile.close();
 }
 
-void listCustomers() {
-	cout << "List of customer:-" << endl;
+void saveCustomers(customer customers[], int numberOfCustomers) {
+	ofstream customerFile;
+
+	customerFile.open("customers.txt", ios::out | ios::trunc);
+
+	customerFile << numberOfCustomers << endl;
 
 	for (int i = 0; i < numberOfCustomers; ++i) {
-		cout << " Name: " << customers[i].name << endl;
-		cout << " Id: " << customers[i].id << endl;
-		cout << " Email: " << customers[i].email << endl;
-		cout << " Phone number: " << customers[i].phoneNumber << endl;
-		cout << " ---------------------------------------------" << endl;
-	}
-}
+		customerFile << customers[i].name << endl;
+		customerFile << customers[i].id << "\t";
+		customerFile << customers[i].email << "\t";
+		customerFile << customers[i].phoneNumber << "\t";
+		customerFile << customers[i].numberOfRentedMovies << endl;
 
-void listRentedMovies() {
-	cout << "List of rented movies:-" << endl;
+		for (int j = 0; j < 5; ++j) {
+			if (customers[i].rentedMovies[j] != "\0") {
+				customerFile << customers[i].rentedMovies[j] << endl;
 
-	for (int i = 0; i < numberOfMovies; ++i) {
-		if (movies[i].timesRented > 0) {
-			cout << " Name:" << movies[i].name << endl;
-			cout << " Number In Stock: " << movies[i].numberInStock << endl;
-			cout << " Price: " << movies[i].price << endl;
-			cout << " Overdue fee: " << movies[i].overdueFee << endl;
-			cout << " Times rented: " << movies[i].timesRented << endl;
-			cout << " Rating: " << movies[i].rating << "/10" << endl;
-			cout << " ---------------------------------------------" << endl;
+				customerFile << customers[i].rentDate[j].tm_hour << "\t";
+				customerFile << customers[i].rentDate[j].tm_mday << "\t";
+				customerFile << customers[i].rentDate[j].tm_mon << "\t";
+				customerFile << customers[i].rentDate[j].tm_year << "\t";
+				customerFile << customers[i].rentDate[j].tm_isdst << "\t";
+
+				customerFile << customers[i].returnDate[j].tm_hour << "\t";
+				customerFile << customers[i].returnDate[j].tm_mday << "\t";
+				customerFile << customers[i].returnDate[j].tm_mon << "\t";
+				customerFile << customers[i].returnDate[j].tm_year << "\t";
+				customerFile << customers[i].returnDate[j].tm_isdst << endl;
+			}
 		}
 	}
+
+	customerFile.close();
 }
