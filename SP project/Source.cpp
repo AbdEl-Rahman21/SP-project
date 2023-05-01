@@ -452,7 +452,7 @@ void saveCustomers() {
 
 void loadCustomers() {
 	ifstream customerfile;
-
+	
 	customerfile.open("customers.txt", ios::in);
 
 	customerfile >> numberOfCustomers;
