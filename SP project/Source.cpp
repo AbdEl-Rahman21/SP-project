@@ -10,7 +10,7 @@ struct movie {
 	string name = "\0";
 	float price = 0;	//Both price and overdueFee are per day
 	float overdueFee = 0;
-	int rating = 0;	//From 1 to 10
+	float rating = 0;	//From 1 to 10
 	int timesRented = 0;
 	int numberInStock = 5;	//Max of 5
 	int numberInList = 0;
@@ -182,9 +182,11 @@ int listRentingCustomers() {
 	int listNumber = 0;
 	int choice = 0;
 
+	cout << "Renting customers:-" << endl;
+
 	for (int i = 0; i < numberOfCustomers; ++i) {
 		if (customers[i].numberOfRentedMovies != 0) {
-			listNumber = ++i - factor;
+			listNumber = i + 1 - factor;
 
 			cout << listNumber << ") Name: " << customers[i].name << "\tId: " << customers[i].id << endl;
 
@@ -210,9 +212,11 @@ int listCustomerMovies(int customerIndex) {
 	int factor = 0;
 	int choice = 0;
 
+	cout << "Customer movies:-" << endl;
+
 	for (int i = 0; i < 5; ++i) {
 		if (customers[customerIndex].rentedMovies[i] != "\0") {
-			listNumber = ++i - factor;
+			listNumber = i + 1 - factor;
 
 			cout << listNumber << ") " << customers[customerIndex].rentedMovies[i] << endl;
 
@@ -298,7 +302,7 @@ void rentMovie()
 			freeM_index = z;
 	}
 	time_t current_date= time(NULL);
-	gmtime_s(&customers[customer_index].rentDate[freeM_index], &current_date);
+	localtime_s(&customers[customer_index].rentDate[freeM_index], &current_date);
 
 	cout << " Here is a list of available movies to rent : " << endl << endl;
 	for (int i = 0; i < numberOfMovies; i++)
@@ -309,7 +313,7 @@ void rentMovie()
 				<< movies[i].name
 				<< " |  Price per day :  " << movies[i].price
 				<< " |  Overdue Fee :  " << movies[i].overdueFee
-				<< " |  Rating :  " << movies[i].rating << "/5" << endl;
+				<< " |  Rating :  " << movies[i].rating << "/10" << endl;
 		}
 	}
 	int days;
@@ -330,8 +334,8 @@ void rentMovie()
 	
 			total = movies[movie_index].price * (days * 1.0);
 		cout << " Your total price is : " << total << endl;
-		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
 		cout << " Your deadline date : " << customers[customer_index].returnDate[freeM_index].tm_mday <<"/"<< customers[customer_index].returnDate[freeM_index].tm_mon+1<< "/" << customers[customer_index].returnDate[freeM_index].tm_year + 1900 << endl;
+		cout << "\t\t\t\t\t * Your film is rented successfully ! *" << endl;
 		movies[movie_index].timesRented++;
 		movies[movie_index].numberInStock--;
 		customers[customer_index].rentedMovies[freeM_index] = movies[movie_index].name;
