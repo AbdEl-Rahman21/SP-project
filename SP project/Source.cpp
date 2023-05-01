@@ -69,19 +69,19 @@ int main() {
 
 			break;
 		case 2:
-			//addCustomer();
+		//	addCustomer();
 
 			break;
 		case 3:
-		//	listCustomers();
+			listCustomers();
 
 			break;
 		case 4:
-		//	listMovies();
+			listMovies();
 
 			break;
 		case 5:
-	//	listRentedMovies();
+		listRentedMovies();
 
 			break;
 		case 6:
@@ -97,7 +97,7 @@ int main() {
 
 			break;
 		case 9:
-//listMostRentedMovies();
+		//	listMostRentedMovies();
 
 			break;
 		case 10:
@@ -289,7 +289,7 @@ void rentMovie()
 	cin >> x;
 	if (x == 'y' || x == 'Y')
 	{
-		//addCustomer();
+	//	addCustomer();
 		customer_index = numberOfCustomers - 1;
 	}
 	else
@@ -530,5 +530,33 @@ void listOverdueCustomers() {
 
 		if (isOverdue)
 			cout << "-------------------------------------" << endl;
+	}
+}
+void listMovies()
+{
+	cout << " " << endl;
+	for (int i = 0; i < numberOfMovies; i++)
+	{
+		cout << movies[i].name<<" | "
+		<<" Rating :" << movies[i].rating << endl;
+		cout << "_________________________________________" << endl << endl;
+	}
+}
+void listCustomers()
+{
+	cout << "Customers : \t\tID" << endl;
+		;
+	for (int i = 0; i < numberOfCustomers; i++)
+	{
+		cout << customers[i].name << "\t\t\t" << customers[i].id << endl;
+	}
+}
+void listRentedMovies()
+{
+	cout <<" \tRented Moveis : " <<endl;
+	for (int i = 0; i < numberOfMovies; i++)
+	{
+		if (movies[i].timesRented > 0)
+			cout <<movies[i].name << "\t | In Stock : " << movies[i].numberInStock << "\t|  Times Rented : " << movies[i].timesRented << endl;
 	}
 }
