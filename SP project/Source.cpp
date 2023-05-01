@@ -12,7 +12,7 @@ struct movie {
 	float overdueFee = 0;
 	int rating = 0;	//From 1 to 10
 	int timesRented = 0;
-	int numberInStock = 5;	//Max of 5
+	int numberInStock = 0;	//Max of 5
 	int numberInList = 0;
 };
 
@@ -108,6 +108,8 @@ int main() {
 
 		cout << "Press 'Y' to continue or any other key to exit: ";
 		cin >> answer;
+
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	} while (answer == 'Y' || answer == 'y');
 
 	saveMovies(movies, numberOfMovies);
@@ -208,6 +210,7 @@ void addMovie(movie movies[], int& numberOfMovies) {
 	cout << "Enter movie rating (max of 10): ";
 	movies[numberOfMovies].rating = getChoice(10);
 
+	movies[numberOfMovies].numberInStock = 5;
 	++numberOfMovies;
 }
 
@@ -232,6 +235,7 @@ int getChoice(int numberOfChoices) {
 
 	while (true) {
 		choice = getValidNumber();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (choice > 0 && choice <= numberOfChoices)
 			return choice;
@@ -250,7 +254,7 @@ void listMovies(movie movies[], int numberOfMovies) {
 		cout << " Overdue fee: " << movies[i].overdueFee << endl;
 		cout << " Times rented: " << movies[i].timesRented << endl;
 		cout << " Rating: " << movies[i].rating << "/10" << endl;
-		cout << " ---------------------------------------------" << endl;
+		cout << " ________________________________________" << endl;
 	}
 }
 
@@ -262,7 +266,7 @@ void listCustomers(customer customers[], int numberOfCustomers) {
 		cout << " Id: " << customers[i].id << endl;
 		cout << " Email: " << customers[i].email << endl;
 		cout << " Phone number: " << customers[i].phoneNumber << endl;
-		cout << " ---------------------------------------------" << endl;
+		cout << " ___________________________________________" << endl;
 	}
 }
 
@@ -270,14 +274,14 @@ void listRentedMovies(movie movies[], int numberOfMovies) {
 	cout << "List of rented movies:-" << endl;
 
 	for (int i = 0; i < numberOfMovies; ++i) {
-		if (movies[i].numberInStock > 0) {
+		if (movies[i].numberInStock < 5) {
 			cout << " Name: " << movies[i].name << endl;
 			cout << " Number In Stock: " << movies[i].numberInStock << endl;
 			cout << " Price: " << movies[i].price << endl;
 			cout << " Overdue fee: " << movies[i].overdueFee << endl;
 			cout << " Times rented: " << movies[i].timesRented << endl;
 			cout << " Rating: " << movies[i].rating << "/10" << endl;
-			cout << " ---------------------------------------------" << endl;
+			cout << " ___________________________________________" << endl;
 		}
 	}
 }
@@ -292,6 +296,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 
 	cout << "Add a new customer? (Press 'Y' for yes or any other key for no): ";
 	cin >> choice;
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 	if (choice == 'y' || choice == 'Y') {
 		//addCustomer();
@@ -328,6 +333,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	while (true) {
 		cout << "Enter movie number: ";
 		cin >> movieIndex;
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (movies[movieIndex].numberInStock != 0)
 			break;
@@ -335,8 +341,15 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 			cout << "Error: Invalid choice." << endl;
 	}
 
-	cout << "Enter number of days: ";
-	days = getValidNumber();
+	while (true) {
+		cout << "Enter number of days: ";
+		days = getValidNumber();
+
+		if (days < 1)
+			cout << "Error: Invalid number of days.";
+		else
+			break;
+	}
 
 	customers[customerIndex].returnDate[freeMovieIndex] = customers[customerIndex].rentDate[freeMovieIndex];
 	customers[customerIndex].returnDate[freeMovieIndex].tm_mday += days;
@@ -349,6 +362,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	cout << "Deadline is: " << customers[customerIndex].returnDate[freeMovieIndex].tm_mday;
 	cout << "/" << customers[customerIndex].returnDate[freeMovieIndex].tm_mon + 1;
 	cout << "/" << customers[customerIndex].returnDate[freeMovieIndex].tm_year + 1900 << endl;
+	cout << "\t\t\t\t\tMovie Rented Successfully!" << endl;
 
 	++movies[movieIndex].timesRented;
 	--movies[movieIndex].numberInStock;
@@ -357,8 +371,6 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 }
 
 int validCustomer(customer customers[], int numberOfCustomers) {
-	bool validId = false;
-	bool validQuota = false;
 	int id = 0;
 
 	while (true) {
@@ -367,24 +379,18 @@ int validCustomer(customer customers[], int numberOfCustomers) {
 
 		for (int i = 0; i < numberOfCustomers; ++i) {
 			if (customers[i].id == id) {
-				validId = true;
+				if (customers[i].numberOfRentedMovies == 5) {
+					cout << "Error: Customer reached there max limit." << endl;
 
-				if (customers[i].numberOfRentedMovies < 5) {
-					validQuota = true;
-
+					return -1;
+				}
+				else {
 					return i;
 				}
 			}
 		}
 
-		if (validId && validQuota == false) {
-			cout << "Error: Customer reached there max limit." << endl;
-
-			return -1;
-		}
-		else if (validId == false) {
-			cout << "Error: Invalid id." << endl;
-		}
+		cout << "Error: Invalid id." << endl;
 	}
 }
 
@@ -401,8 +407,8 @@ void returnMovie(movie movies[], customer customers[], int numberOfMovies, int n
 
 	overdueDays = round(difftime(time(NULL), mktime(&customers[customerIndex].returnDate[customerMovieIndex])) / 86400);
 
-	rentedDays = round(difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
-		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400);
+	rentedDays = difftime(mktime(&customers[customerIndex].returnDate[customerMovieIndex]),
+		mktime(&customers[customerIndex].rentDate[customerMovieIndex])) / 86400;
 
 	if (overdueDays < 0)
 		overdueDays = 0;
@@ -524,7 +530,7 @@ void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovi
 		}
 
 		if (isOverdue)
-			cout << "-------------------------------------" << endl;
+			cout << "________________________________________" << endl;
 	}
 }
 
