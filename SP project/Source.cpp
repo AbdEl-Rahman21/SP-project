@@ -292,6 +292,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	int freeMovieIndex = 0;
 	char choice = '\0';
 	time_t temp = 0;
+	
 
 	cout << "Add a new customer? (Press 'Y' for yes or any other key for no): ";
 	cin >> choice;
@@ -317,25 +318,46 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	}
 
 	customers[customerIndex].rentDate[freeMovieIndex] = getCurrentTime();
-
 	cout << "List of available movies:-" << endl;
 
-	for (int i = 0; i < numberOfMovies; ++i) {
-		if (movies[i].numberInStock != 0) {
-			cout << " " << i << ") " << movies[i].name;
-			cout << " | Price: " << movies[i].price;
-			cout << " | Overdue fee: " << movies[i].overdueFee;
-			cout << " | Rating: " << movies[i].rating << "/10" << endl;
+	for (int i = 0; i < numberOfMovies; ++i)
+	{
+		bool isRented = false;
+		if (movies[i].numberInStock != 0)
+		{
+			for (int x = 0; x < 5; x++)
+			{
+				if (customers[customerIndex].rentedMovies[x] == movies[i].name)
+					isRented = true;
+			}
+			if (isRented == false)
+			{
+				cout << " " << i << ") " << movies[i].name;
+				cout << " | Price: " << movies[i].price;
+				cout << " | Overdue fee: " << movies[i].overdueFee;
+				cout << " | Rating: " << movies[i].rating << "/10" << endl;
+			}
 		}
 	}
 
 	while (true) {
 		cout << "Enter movie number: ";
-		cin >> movieIndex;
+		 movieIndex=getValidNumber();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (movies[movieIndex].numberInStock != 0)
-			break;
+		{
+			for (int x = 0; x < 5; x++)
+			{
+				if (customers[customerIndex].rentedMovies[x] != movies[movieIndex].name)
+					break;
+				else
+					cout << "Error: Invalid choice." << endl;
+			}
+
+		}
+
+			
 		else
 			cout << "Error: Invalid choice." << endl;
 	}
@@ -347,6 +369,7 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 		if (days < 1)
 			cout << "Error: Invalid number of days.";
 		else
+
 			break;
 	}
 
