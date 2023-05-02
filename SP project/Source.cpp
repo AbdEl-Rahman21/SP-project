@@ -284,7 +284,7 @@ void listRentedMovies(movie movies[], int numberOfMovies) {
 
 void rentMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
 	int days = 0;
-	int movieIndex = 0;
+	int movieIndex = 0;	
 	int customerIndex = 0;
 	int freeMovieIndex = 0;
 	char choice = '\0';
@@ -369,7 +369,7 @@ int validCustomer(customer customers[], int numberOfCustomers) {
 			if (customers[i].id == id) {
 				validId = true;
 
-				if (customers[i].numberOfRentedMovies < 5) {
+				if (customers[i].numberOfRentedMovies < 5) {	
 					validQuota = true;
 
 					return i;
