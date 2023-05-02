@@ -292,7 +292,6 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	int freeMovieIndex = 0;
 	char choice = '\0';
 	time_t temp = 0;
-	
 
 	cout << "Add a new customer? (Press 'Y' for yes or any other key for no): ";
 	cin >> choice;
@@ -320,18 +319,19 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	customers[customerIndex].rentDate[freeMovieIndex] = getCurrentTime();
 	cout << "List of available movies:-" << endl;
 
-	for (int i = 0; i < numberOfMovies; ++i)
-	{
+	for (int i = 0; i < numberOfMovies; ++i) {
 		bool isRented = false;
-		if (movies[i].numberInStock != 0)
-		{
-			for (int x = 0; x < 5; x++)
-			{
-				if (customers[customerIndex].rentedMovies[x] == movies[i].name)
+
+		if (movies[i].numberInStock != 0) {
+			for (int j = 0; j < 5; ++j) {
+				if (customers[customerIndex].rentedMovies[j] == movies[i].name) {
 					isRented = true;
+
+					break;
+				}
 			}
-			if (isRented == false)
-			{
+
+			if (!isRented) {
 				cout << " " << i << ") " << movies[i].name;
 				cout << " | Price: " << movies[i].price;
 				cout << " | Overdue fee: " << movies[i].overdueFee;
@@ -341,35 +341,40 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	}
 
 	while (true) {
+		bool isRented = false;
 		cout << "Enter movie number: ";
-		 movieIndex=getValidNumber();
+
+		movieIndex = getValidNumber();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-		if (movies[movieIndex].numberInStock != 0)
-		{
-			for (int x = 0; x < 5; x++)
-			{
-				if (customers[customerIndex].rentedMovies[x] != movies[movieIndex].name)
-					break;
-				else
+		if (movies[movieIndex].numberInStock != 0) {
+			for (int i = 0; i < 5; ++i) {
+				if (customers[customerIndex].rentedMovies[i] == movies[movieIndex].name) {
+					isRented = true;
+
 					cout << "Error: Invalid choice." << endl;
+
+					break;
+				}
 			}
 
+			if (!isRented)
+				break;
 		}
-
-			
-		else
+		else {
 			cout << "Error: Invalid choice." << endl;
+		}
 	}
 
 	while (true) {
 		cout << "Enter number of days: ";
+
 		days = getValidNumber();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (days < 1)
 			cout << "Error: Invalid number of days.";
 		else
-
 			break;
 	}
 
