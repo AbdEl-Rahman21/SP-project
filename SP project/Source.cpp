@@ -35,11 +35,11 @@ int listRentingCustomers(customer customers[], int numberOfCustomers);
 int listCustomerMovies(customer customers[], int customerIndex);
 int validCustomer(customer customers[], int numberOfCustomers);
 void addMovie(movie movies[], int& numberOfMovies);
-void addCustomer();
+void addCustomer(customer customers[], int& numberOfCustomers);
 void listMovies(movie movies[], int numberOfMovies);
 void listCustomers(customer customers[], int numberOfCustomers);
 void listRentedMovies(movie movies[], int numberOfMovies);
-void rentMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
+void rentMovie(movie movies[], customer customers[], int numberOfMovies, int& numberOfCustomers);
 void returnMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
 void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
 void listMostRentedMovies();
@@ -47,7 +47,7 @@ void saveMovies(movie movies[], int numberOfMovies);
 void loadMovies(movie movies[], int& numberOfMovies);
 void saveCustomers(customer customers[], int numberOfCustomers);
 void loadCustomers(customer customers[], int& numberOfCustomers);
-void listMostRatedMovies();
+void listMostRatedMovies(movie movies[], int numberOfMovies);
 void reset(movie movies[], customer customers[], int numberOfMovies, int customerMovieIndex, int customerIndex, int& movieIndex);
 float getValidNumber();
 
@@ -55,8 +55,8 @@ int main() {
 	int numberOfMovies = 0;
 	int numberOfCustomers = 0;
 	char answer = '\0';
-	movie movies[100];
-	customer customers[100];
+	movie movies[50];
+	customer customers[50];
 
 	loadMovies(movies, numberOfMovies);
 	loadCustomers(customers, numberOfCustomers);
@@ -70,7 +70,7 @@ int main() {
 
 			break;
 		case 2:
-			//addCustomer();
+			addCustomer(customers, numberOfCustomers);
 
 			break;
 		case 3:
@@ -102,7 +102,7 @@ int main() {
 
 			break;
 		case 10:
-			//listMostRatedMovies();
+			listMostRatedMovies(movies, numberOfMovies);
 
 			break;
 		}
@@ -196,8 +196,6 @@ int displayMenu() {
 
 void addMovie(movie movies[], int& numberOfMovies) {
 	cout << "Enter movie name: ";
-
-	cin.ignore();
 	getline(cin, movies[numberOfMovies].name);
 
 	cout << "Enter movie price: ";
@@ -243,6 +241,21 @@ int getChoice(int numberOfChoices) {
 	}
 }
 
+void addCustomer(customer customers[], int& numberOfCustomers) {
+	cout << "Enter customer name: ";
+	getline(cin, customers[numberOfCustomers].name);
+
+	cout << "Enter customer email: ";
+	cin >> customers[numberOfCustomers].email;
+
+	cout << "Enter customer phone number: ";
+	customers[numberOfCustomers].phoneNumber = getValidNumber();
+
+	customers[numberOfCustomers].id = numberOfCustomers;
+
+	++numberOfCustomers;
+}
+
 void listMovies(movie movies[], int numberOfMovies) {
 	cout << "List of movies:-" << endl;
 
@@ -285,7 +298,7 @@ void listRentedMovies(movie movies[], int numberOfMovies) {
 	}
 }
 
-void rentMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers) {
+void rentMovie(movie movies[], customer customers[], int numberOfMovies, int& numberOfCustomers) {
 	int days = 0;
 	int movieIndex = 0;	
 	int customerIndex = 0;
@@ -298,7 +311,8 @@ void rentMovie(movie movies[], customer customers[], int numberOfMovies, int num
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 	if (choice == 'y' || choice == 'Y') {
-		//addCustomer();
+		addCustomer(customers, numberOfCustomers);
+
 		customerIndex = numberOfCustomers - 1;
 	}
 	else {
@@ -468,7 +482,7 @@ int listRentingCustomers(customer customers[], int numberOfCustomers) {
 		if (customers[i].numberOfRentedMovies != 0) {
 			listNumber = i + 1 - factor;
 
-			cout << listNumber << ") Name: " << customers[i].name << " | Id: " << customers[i].id << endl;
+			cout << " " << listNumber << ") Name: " << customers[i].name << " | Id: " << customers[i].id << endl;
 
 			customers[i].numberInList = listNumber;
 		}
@@ -498,7 +512,7 @@ int listCustomerMovies(customer customers[], int customerIndex) {
 		if (customers[customerIndex].rentedMovies[i] != "\0") {
 			listNumber = i + 1 - factor;
 
-			cout << listNumber << ") " << customers[customerIndex].rentedMovies[i] << endl;
+			cout << " " << listNumber << ") " << customers[customerIndex].rentedMovies[i] << endl;
 
 			numberOfMoviesInList[i] = listNumber;
 		}
@@ -571,6 +585,40 @@ void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovi
 
 		if (isOverdue)
 			cout << "________________________________________" << endl;
+	}
+}
+
+void listMostRatedMovies(movie movies[], int numberOfMovies) {
+	int temp[50][2] = { 0 };
+	int factor = 1;
+
+	for (int i = 0; i < numberOfMovies; ++i) {
+		if (temp[0][0] < movies[i].rating) {
+			temp[0][0] = movies[i].rating;
+			temp[0][1] = i;
+		}
+		else if (temp[1][0] < movies[i].rating) {
+			temp[1][0] = movies[i].rating;
+			temp[1][1] = i;
+		}
+		else if (temp[2][0] < movies[i].rating) {
+			temp[2][0] = movies[i].rating;
+			temp[2][1] = i;
+		}
+		else if (temp[0][0] == temp[1][0] && temp[1][0] == temp[2][0] && temp[2][0] == movies[i].rating) {
+			temp[2 + factor][0] = movies[i].rating;
+			temp[2 + factor][1] = i;
+
+			++factor;
+		}
+	}
+
+	cout << "Top rated movies:-" << endl;
+
+	for (int i = 0; temp[i][0] != 0; ++i) {
+		cout << " Name: " << movies[temp[i][1]].name << endl;
+		cout << " Rating: " << movies[temp[i][1]].rating << endl;
+		cout << "______________________________________________" << endl;
 	}
 }
 
