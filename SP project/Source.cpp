@@ -250,9 +250,9 @@ void addCustomer(customer customers[], int& numberOfCustomers) {
 
 	cout << "Enter customer phone number: ";
 	customers[numberOfCustomers].phoneNumber = getValidNumber();
-
 	customers[numberOfCustomers].id = numberOfCustomers;
-
+	cout << " Customer ID : " << customers[numberOfCustomers].id << endl;
+	cout << "\t\t\t * Customer is added * " << endl;
 	++numberOfCustomers;
 }
 
