@@ -42,7 +42,7 @@ void listRentedMovies(movie movies[], int numberOfMovies);
 void rentMovie(movie movies[], customer customers[], int numberOfMovies, int& numberOfCustomers);
 void returnMovie(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
 void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovies, int numberOfCustomers);
-void listMostRentedMovies();
+void listMostRentedMovies(movie movies[], int numberOfMovies);
 void saveMovies(movie movies[], int numberOfMovies);
 void loadMovies(movie movies[], int& numberOfMovies);
 void saveCustomers(customer customers[], int numberOfCustomers);
@@ -98,7 +98,7 @@ int main() {
 
 			break;
 		case 9:
-			//listMostRentedMovies();
+			listMostRentedMovies(movies, numberOfMovies);
 
 			break;
 		case 10:
@@ -588,16 +588,54 @@ void listOverdueCustomers(movie movies[], customer customers[], int numberOfMovi
 	}
 }
 
+void listMostRentedMovies(movie movies[], int numberOfMovies) {
+	int maxTimesRented[3] = { 0 };
+	int movieIndex[3] = { 0 };
+
+	for (int i = 0; i < numberOfMovies; ++i) {
+		if (movies[i].timesRented > maxTimesRented[0]) {
+			maxTimesRented[0] = movies[i].timesRented;
+			movieIndex[0] = i;
+		}
+		else if (movies[i].timesRented > maxTimesRented[1]) {
+			maxTimesRented[1] = movies[i].timesRented;
+			movieIndex[1] = i;
+		}
+		else if (movies[i].timesRented > maxTimesRented[2]) {
+			maxTimesRented[2] = movies[i].timesRented;
+			movieIndex[2] = i;
+		}
+	}
+
+	cout << "Top 3 rented movies:-" << endl;
+
+	for (int i = 0; i < 3; ++i) {
+		cout << " Name: " << movies[movieIndex[i]].name << endl;
+		cout << " Times rented: " << movies[movieIndex[i]].timesRented << endl;
+		cout << "______________________________________________" << endl;
+	}
+}
+
 void listMostRatedMovies(movie movies[], int numberOfMovies) {
-	int temp[50][2] = { 0 };
-	int factor = 1;
+	int temp[3][2] = { 0 };
 
 	for (int i = 0; i < numberOfMovies; ++i) {
 		if (temp[0][0] < movies[i].rating) {
+			//shift elements from 2 to 3
+			temp[2][0] = temp[1][0];
+			temp[2][1] = temp[1][1];
+			//shift elements from 1 to 2
+			temp[1][0] = temp[0][0];
+			temp[1][1] = temp[0][1];
+			//new element in 1
 			temp[0][0] = movies[i].rating;
 			temp[0][1] = i;
 		}
 		else if (temp[1][0] < movies[i].rating) {
+			//shift elements from 2 to 3
+			temp[2][0] = temp[1][0];
+			temp[2][1] = temp[1][1];
+			//new element in 2
 			temp[1][0] = movies[i].rating;
 			temp[1][1] = i;
 		}
@@ -605,17 +643,11 @@ void listMostRatedMovies(movie movies[], int numberOfMovies) {
 			temp[2][0] = movies[i].rating;
 			temp[2][1] = i;
 		}
-		else if (temp[0][0] == temp[1][0] && temp[1][0] == temp[2][0] && temp[2][0] == movies[i].rating) {
-			temp[2 + factor][0] = movies[i].rating;
-			temp[2 + factor][1] = i;
-
-			++factor;
-		}
 	}
 
-	cout << "Top rated movies:-" << endl;
+	cout << "Top 3 rated movies:-" << endl;
 
-	for (int i = 0; temp[i][0] != 0; ++i) {
+	for (int i = 0; i < 3; ++i) {
 		cout << " Name: " << movies[temp[i][1]].name << endl;
 		cout << " Rating: " << movies[temp[i][1]].rating << endl;
 		cout << "______________________________________________" << endl;
