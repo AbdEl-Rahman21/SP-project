@@ -10,7 +10,7 @@ struct movie {
 	string name = "\0";
 	float price = 0;	//Both price and overdueFee are per day
 	float overdueFee = 0;
-	int rating = 0;	//From 1 to 10
+	float rating = 0;	//From 1 to 10
 	int timesRented = 0;
 	int numberInStock = 0;	//Max of 5
 	int numberInList = 0;
